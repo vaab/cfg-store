@@ -1,0 +1,9 @@
+# -*- mode: shell-script -*-
+
+
+export FZF_DEFAULT_OPTS="--color 'fg:#bbccdd,fg+:#ddeeff,bg:#111820,preview-bg:#223344,border:#778899'"
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+bind '"\C-t": transpose-chars'

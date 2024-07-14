@@ -1,0 +1,5 @@
+# -*- mode: shell-script -*-
+
+## Disable interpretation of C-s to freeze terminal output
+## Enabling other usage for bash (has search-forward)
+stty stop ''

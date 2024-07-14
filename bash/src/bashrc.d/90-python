@@ -1,0 +1,4 @@
+# -*- mode: shell-script -*-
+
+#export PYTHONSTARTUP="~/.pythonstartup"
+PYTHONPATH=~/.local/lib/python/site-packages:$PYTHONPATH

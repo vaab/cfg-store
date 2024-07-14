@@ -1,0 +1,40 @@
+# -*- mode: shell-script -*-
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+## XXXvaab: This file is read and executed by bash in a non-login but
+## interactive use of bash. (as calling "bash<RETURN>")
+##
+## This file is not read if bash is called via "sh" !!
+
+
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+to_load=()
+for file in ~/.config/bash/bashrc.d/{private/{host/"$HOSTNAME"/,},host/"$HOSTNAME"/,}* ; do
+    [ -r "$file" ] || continue
+    [ -f "$file" ] || continue
+    [ -d "$file" ] && continue
+    [[ "$file" == *~ ]] && continue
+    [[ "$file" == *.swp ]] && continue
+    [[ "$file" == *.bak ]] && continue
+    [[ "$file" == *.disable ]] && continue
+    [[ "$file" =~ /[0-9]+-[a-zA-Z0-9_.]+$ ]] || continue
+    prio=${file%%-*}
+    to_load+=("$prio:$file")
+done
+
+## sort scripts
+
+to_load=($(IFS=$'\n' ; sort -n <<<"${to_load[*]}"))
+
+## load scripts
+
+for prio_file in "${to_load[@]}"; do
+    source "${prio_file#*:}" || echo "Failed to load: ${prio_file#*:}"
+done

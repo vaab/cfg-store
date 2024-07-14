@@ -1,0 +1,120 @@
+[colors.bright]
+black = "#505050"
+blue = "#729FCF"
+cyan = "#34E2E2"
+green = "#8AE234"
+magenta = "#AD7FA8"
+red = "#EF2929"
+white = "#ffffff"
+yellow = "#FCE94F"
+
+[colors.normal]
+black = "#555753"
+blue = "#3465A4"
+cyan = "#06989A"
+green = "#4E9A06"
+magenta = "#75507B"
+red = "#CC0000"
+white = "#b0b0b0"
+yellow = "#C4A000"
+
+[colors.primary]
+foreground = "#BABDB6"
+background = "#020202"
+
+[font]
+#builtin_box_drawing = true
+size = 9
+offset = { y = -1 }
+glyph_offset = { y = 1 }
+
+[font.normal]
+#family = "RobotoMono"
+family = "Monaco for Powerline"
+style = "Regular"
+
+[[keyboard.bindings]]
+chars = "\u0002%"
+key = "e"
+mods = "Control|Shift"
+
+[[keyboard.bindings]]
+chars = "\u0002\""
+key = "o"
+mods = "control|shift"
+
+[[keyboard.bindings]]
+chars = "\u0002c"
+key = "n"
+mods = "Control|Shift"
+
+[[keyboard.bindings]]
+chars = "\u0002z"
+key = "x"
+mods = "Control|Shift"
+
+[[keyboard.bindings]]
+chars = "\u0002c"
+key = "t"
+mods = "Control|Shift"
+
+[[keyboard.bindings]]
+chars = "\u0002p"
+key = "Left"
+mods = "Super"
+
+[[keyboard.bindings]]
+chars = "\u0002n"
+key = "Right"
+mods = "Super"
+
+[[keyboard.bindings]]
+chars = "\u0002\u0010"
+key = "Left"
+mods = "Super|Shift"
+
+[[keyboard.bindings]]
+chars = "\u0002\u000e"
+key = "Right"
+mods = "Super|Shift"
+
+[[keyboard.bindings]]
+action = "None"
+key = "b"
+mods = "Control|Shift"
+
+[[keyboard.bindings]]
+chars = "\u0002p"
+key = "PageUp"
+mods = "Control"
+
+[[keyboard.bindings]]
+chars = "\u0002n"
+key = "PageDown"
+mods = "Control"
+
+
+[[keyboard.bindings]]
+action = "None"
+key = "Equals"
+mods = "Control"
+
+[[keyboard.bindings]]
+action = "IncreaseFontSize"
+key = "Plus"
+mods = "Control|Shift"
+
+
+
+[scrolling]
+history = 0
+
+[shell]
+args = ["new-session", "-A", "-s", "main"]
+program = "/opt/merge/bin/tmux"
+
+[window]
+decorations = "None"
+startup_mode = "Maximized"
+
+padding = { x = 1, y = 2 }

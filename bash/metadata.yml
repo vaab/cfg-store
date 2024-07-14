@@ -1,0 +1,8 @@
+links:
+  ## How to link $CHARM/src/* in your current $HOME/*
+  src:
+    ## All keys start from $HOME, all values start from $CHARM_PATH/src
+    bashrc: .bashrc       ## this one should not be required
+    logout: .bash_logout  ## this one should not be required
+    .: .config/bash
+

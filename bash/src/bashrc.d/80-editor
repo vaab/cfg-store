@@ -1,0 +1,4 @@
+# -*- mode: shell-script -*-
+
+export EDITOR=emacs
+export VISUAL="et"

@@ -1,0 +1,5 @@
+# -*- mode: shell-script -*-
+
+export GOPATH=~/.local/state/go
+
+path-prepend $GOPATH/bin

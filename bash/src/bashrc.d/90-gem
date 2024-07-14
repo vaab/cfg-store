@@ -1,0 +1,3 @@
+# -*- mode: shell-script -*-
+
+path-prepend ~/.gem/ruby/*/bin

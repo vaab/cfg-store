@@ -1,0 +1,35 @@
+# -*- mode: shell-script -*-
+
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+HISTTIMEFORMAT="%Y-%m-%d %T  "
+
+## XXXvlab: note that it can slow bash booting time. Probably not so much on
+## SSD and recent computer.
+HISTSIZE=9000000    ## Limit in nbr of lines available per process
+HISTFILESIZE=      ## Limit size of file
+
+HISTIGNORE="&:[bf]g:exit:ls:history"
+
+if [ -f ~/.config/bash/lib/preexec ]; then
+    ## This allows to timestamp the moment the command is entered
+
+    source ~/.config/bash/lib/preexec
+    preexec_history_append() {
+        history -a
+    }
+
+    preexec_functions+=(preexec_history_append)
+
+else
+    if [ -z "$PROMPT_COMMAND" ]; then
+        PROMPT_COMMAND="history -a"
+    else
+        PROMPT_COMMAND="history -a ; $PROMPT_COMMAND"
+    fi
+fi

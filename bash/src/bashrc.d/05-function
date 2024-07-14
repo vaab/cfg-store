@@ -1,0 +1,37 @@
+# -*- mode: shell-script -*-
+
+# Prompt easy management
+prompt() {
+	prompt_name="prompt.$1.rc"
+
+	for i in /etc/prompt ~/.prompt; do
+		[ -f "$i/$prompt_name" ] &&
+			. "$i/$prompt_name"
+	done
+}
+
+
+update-repo() {
+    for source in "$@"; do
+        sudo apt-get update -o Dir::Etc::sourcelist="sources.list.d/${source}" \
+        -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0"
+    done
+}
+
+
+glog () {
+    git log --graph \
+    --pretty=tformat:%C\(yellow\ normal\)%h%Creset\ %C\(blue\ normal\)%an%Creset\ %s\ %Cgreen%d%Creset "$@"
+}
+
+
+path-prepend() {
+    local path
+    ## Add a path to the beginning of the PATH, and remove any duplicates
+    for path in "$@"; do
+        [ -d "$path" ] || continue
+        PATH=":$PATH:"; PATH="${PATH//:$path:/:}" ; PATH="${PATH:1:-1}"
+        PATH="$path:$PATH"
+    done
+    export PATH
+}
