@@ -35,6 +35,24 @@ to_load=($(IFS=$'\n' ; sort -n <<<"${to_load[*]}"))
 
 ## load scripts
 
-for prio_file in "${to_load[@]}"; do
-    source "${prio_file#*:}" || echo "Failed to load: ${prio_file#*:}"
-done
+if [ -n "$BASH_PROFILE" ]; then
+    BASH_PROFILE_FILE=/tmp/bash-profile.$$
+    rm -f "$BASH_PROFILE_FILE"
+    time_exec() {
+        local x errlvl out
+        exec 3>&1 4>&2
+        export TIMEFORMAT="%R %U %S $*"
+        { time "$@" 1>&3 2>&4; } >>"$BASH_PROFILE_FILE" 2>&1
+        tail -n1 "$BASH_PROFILE_FILE"
+        errlvl=$?
+        exec 3>&- 4>&-
+        return $errlvl
+    }
+    for prio_file in "${to_load[@]}"; do
+        time_exec source "${prio_file#*:}" || echo "Failed to load: ${prio_file#*:}"
+    done
+else
+    for prio_file in "${to_load[@]}"; do
+        source "${prio_file#*:}" || echo "Failed to load: ${prio_file#*:}"
+    done
+fi
