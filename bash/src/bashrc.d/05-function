@@ -35,3 +35,28 @@ path-prepend() {
     done
     export PATH
 }
+
+
+autoload() {
+    local label="$1" exec="$2"
+    local autoload_ref i
+    shift 2
+    [ "$(type -t "__init_$label")" = function ] && return
+
+    declare -n autoload_ref=__autoload_${label}_commands
+    autoload_ref=("$@")
+    eval "
+        __init_$label() {
+            local i
+            for i in \"\${__autoload_${label}_commands[@]}\"; do
+                unalias \"\$i\"
+            done
+            $exec
+            unset __autoload_${label}_commands
+            unset -f __init_${label}
+        }
+    "
+    for i in "$@"; do
+        alias "$i"="__init_${label} && $i"
+    done
+}

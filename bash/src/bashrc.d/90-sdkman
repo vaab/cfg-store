@@ -1,6 +1,5 @@
 # -*- mode: shell-script -*-
 
+export SDKMAN_DIR="$HOME/.sdkman"
 
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="/home/vaab/.sdkman"
-[[ -s "/home/vaab/.sdkman/bin/sdkman-init.sh" ]] && source "/home/vaab/.sdkman/bin/sdkman-init.sh"
+autoload sdkman "source $SDKMAN_DIR/bin/sdkman-init.sh" sdk
