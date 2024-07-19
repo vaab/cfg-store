@@ -1,11 +1,38 @@
 # -*- mode: shell-script -*-
 
 if ! type -p pyenv >/dev/null 2>&1; then
+    echo "Warning: pyenv not found, skipping."
     return
 fi
 export PYENV_ROOT="$HOME/dev/python/pyenv"
 export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 
-eval "$(pyenv init -)"
+## rewrote the output of `pyenv init -` to avoid loading python
+## and slow init:
 
+export PYENV_SHELL=bash
+path-prepend "$PYENV_ROOT/shims"
 path-prepend "$PYENV_ROOT/bin"
+
+source "$PYENV_ROOT/completions/pyenv.$PYENV_SHELL"
+
+## XXXvlab: very slow, and should be launched only when new
+## exectuables are installed
+#command pyenv rehash 2>/dev/null
+
+pyenv() {
+    local command
+    command="${1:-}"
+    if [ "$#" -gt 0 ]; then
+        shift
+    fi
+
+    case "$command" in
+        activate|deactivate|rehash|shell)
+            eval "$(pyenv "sh-$command" "$@")"
+            ;;
+        *)
+            command pyenv "$command" "$@"
+            ;;
+    esac
+}
