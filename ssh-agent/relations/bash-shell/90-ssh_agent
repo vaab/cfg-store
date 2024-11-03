@@ -16,9 +16,19 @@ ssh:agent:init() {
     umask "${old_umask}"
     . "$SSH_AGENT_ENV" -t 3600 > /dev/null
 }
+export -f ssh:agent:init
 
 ssh() {
     [ -n "$SSH_AGENT_PID" -a -d "/proc/$SSH_AGENT_PID" ] || ssh:agent:init </dev/null
-    /usr/bin/ssh "$@"
+    command ssh "$@"
 }
+export -f ssh
 
+
+ssh-add() {
+    [ -n "$SSH_AGENT_PID" -a -d "/proc/$SSH_AGENT_PID" ] || ssh:agent:init </dev/null
+    command ssh-add "$@"
+}
+export -f ssh-add
+
+export GIT_SSH_COMMAND="ssh-through-agent"

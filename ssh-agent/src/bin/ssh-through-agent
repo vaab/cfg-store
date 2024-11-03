@@ -1,0 +1,53 @@
+#!/bin/bash
+
+
+# Get the absolute path to the running script
+SCRIPT_PATH="$(readlink -f "$0")"
+EXNAME="${0##*/}"
+
+IFS=':' read -ra PATH_DIRS <<< "$PATH"
+
+next_candidate=
+found_ourselves=
+for dir in "${PATH_DIRS[@]}"; do
+    # Skip if the directory is empty
+    [ -n "$dir" ] || continue
+    [ -d "$dir" ] || continue
+    [ -x "$dir/$EXNAME" ] || continue
+    # Check if an executable with the same name exists in this directory
+    cmd_path="$(readlink -f "$dir/$EXNAME")"
+    if [ "$cmd_path" == "$SCRIPT_PATH" ]; then
+        # Found the script itself
+        found_ourselves=1
+        continue
+    fi
+    [ -n "$found_ourselves" ] || continue
+    next_candidate="$cmd_path"
+    break
+done
+
+if [ -z "$next_candidate" ]; then
+    echo "Error: Could not find the next '$EXNAME' in the PATH" >&2
+    exit 1
+fi
+
+# Function to find running ssh-agent
+ssh:agent:init() {
+    local agent_sock old_umask SSH_AGENT_ENV
+    SSH_AGENT_ENV=~/.ssh/ssh-agent-env
+    if [ -e "$SSH_AGENT_ENV" ]; then
+        . "$SSH_AGENT_ENV" > /dev/null
+        if [ -d "/proc/$SSH_AGENT_PID" ]; then
+            return 0
+        fi
+    fi
+    old_umask=$(umask)
+    umask 077
+    /usr/bin/ssh-agent -s > "${SSH_AGENT_ENV}"
+    umask "${old_umask}"
+    . "$SSH_AGENT_ENV" -t 3600 > /dev/null
+}
+
+[ -n "$SSH_AGENT_PID" -a -d "/proc/$SSH_AGENT_PID" ] || ssh:agent:init </dev/null
+
+exec "$next_candidate" "$@"
