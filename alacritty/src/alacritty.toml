@@ -1,3 +1,7 @@
+import = [
+  "~/.config/alacritty/local.toml",
+]
+
 [colors.bright]
 black = "#505050"
 blue = "#729FCF"
@@ -24,13 +28,17 @@ background = "#020202"
 
 [font]
 #builtin_box_drawing = true
-size = 9
-offset = { y = -1 }
-glyph_offset = { y = 1 }
+#size = 9
+#offset = { y = -1 }
+#glyph_offset = { y = -1 }
 
 [font.normal]
 #family = "RobotoMono"
 family = "Monaco for Powerline"
+#family = "UbuntuSansM Nerd Font"
+#family = "NotoSansM Nerd Font"
+#family = "Cousine Nerd Font"
+#style = "Condensed"
 style = "Regular"
 
 [[keyboard.bindings]]
@@ -64,8 +72,18 @@ key = "Left"
 mods = "Super"
 
 [[keyboard.bindings]]
+chars = "\u0002p"
+key = "h"
+mods = "Super"
+
+[[keyboard.bindings]]
 chars = "\u0002n"
 key = "Right"
+mods = "Super"
+
+[[keyboard.bindings]]
+chars = "\u0002n"
+key = "l"
 mods = "Super"
 
 [[keyboard.bindings]]
@@ -74,8 +92,18 @@ key = "Left"
 mods = "Super|Shift"
 
 [[keyboard.bindings]]
+chars = "\u0002\u0010"
+key = "h"
+mods = "Super|Shift"
+
+[[keyboard.bindings]]
 chars = "\u0002\u000e"
 key = "Right"
+mods = "Super|Shift"
+
+[[keyboard.bindings]]
+chars = "\u0002\u000e"
+key = "l"
 mods = "Super|Shift"
 
 [[keyboard.bindings]]
@@ -93,11 +121,18 @@ chars = "\u0002n"
 key = "PageDown"
 mods = "Control"
 
-
 [[keyboard.bindings]]
 action = "None"
 key = "Equals"
 mods = "Control"
+
+## Deactivate Ctrl+Shift space as I don't need alacritty to scroll
+## or have there own substitute to copy mode from tmux
+
+[[keyboard.bindings]]
+action = "None"
+key = "Space"
+mods = "Control|Shift"
 
 [[keyboard.bindings]]
 action = "IncreaseFontSize"
@@ -111,7 +146,7 @@ history = 0
 
 [shell]
 args = ["new-session", "-A", "-s", "main"]
-program = "/opt/merge/bin/tmux"
+program = "tmux"
 
 [window]
 decorations = "None"
