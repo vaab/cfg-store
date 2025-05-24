@@ -3,4 +3,6 @@
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
 
-autoload nvm "source $NVM_DIR/nvm.sh" tnx ns nvm node npm yarm gulp grunt webpack npx
+autoload nvm "source $NVM_DIR/nvm.sh" tnx ns nvm node npm yarm gulp grunt webpack npx pkg
+
+
