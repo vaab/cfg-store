@@ -1,0 +1,44 @@
+#!/bin/bash
+
+
+LIVE_PROFILE_LIB_PATHS=(
+    ~/.local/share/live-profile/lib.sh
+    /usr/share/live-profile/lib.sh
+)
+
+found=
+for lib in "${LIVE_PROFILE_LIB_PATHS[@]}"; do
+    [ -e "$lib" ] && {
+        . "$lib"
+        found=1
+        break
+    }
+done
+if [ -z "$found" ]; then
+    echo "live-profile library not found." >&2
+    exit 1
+fi
+
+TARGET_ENV_FILE="$(realpath "$1")" || {
+    echo "Invalid target environment file path." >&2
+    exit 1
+}
+if ! [ -d "${TARGET_ENV_FILE%/*}" ]; then
+    mkdir -p "${TARGET_ENV_FILE%/*}" || {
+        echo "Failed to create directory for target environment file." >&2
+        exit 1
+    }
+fi
+
+export LIVE_PROFILE_DEBUG=1
+if ! env=$(live-profile:get systemd); then
+    echo POPO >&2
+    exit 1
+fi
+
+if [ -n "$env" ]; then
+    echo "$env" | sed -r 's%socks5h://%socks5://%g'
+fi > "$TARGET_ENV_FILE" || {
+    echo "Failed to write to target environment file." >&2
+    exit 1
+}

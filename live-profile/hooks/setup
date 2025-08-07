@@ -1,0 +1,31 @@
+#!/bin/bash
+
+mkdir -p ~/.config/live-profile/
+
+install_system_live-profile-systemd-env-file () {
+
+    SYSTEM_BIN_PATH=/usr/local/bin
+    SYSTEM_SHARE_PATH=/usr/share
+    if [ -e "$SYSTEM_BIN_PATH/live-profile-systemd-env-file" ]; then
+        echo "File $SYSTEM_BIN_PATH/live-profile-systemd-env-file already exists." >&2
+        return 0
+    fi
+
+    echo "Require sudo to install the system live-profile-systemd-env-file"
+    sudo ln -sfv "$CHARM_PATH"/src/bin/live-profile-systemd-env-file "$SYSTEM_BIN_PATH" || exit 1
+    sudo mkdir -p "$SYSTEM_SHARE_PATH/live-profile" || exit 1
+    sudo ln -sfv "$CHARM_PATH"/share/live-profile/lib.sh "$SYSTEM_SHARE_PATH/live-profile/" || exit 1
+}
+
+
+install_system_live-profile-systemd-env-file
+
+
+cd resources/live-profile-shim || return 1
+gcc -std=c11 -O2 -Wall -Wextra -o live-profile-shim live-profile-shim.c || return 1
+mv live-profile-shim live-profile-shim-${HOSTNAME}
+
+for target in ~/.local/bin/{ssh{,-add},git}; do
+  ln -sf "$CHARM_PATH/resources/live-profile-shim/live-profile-shim-${HOSTNAME}" "$target"
+done
+

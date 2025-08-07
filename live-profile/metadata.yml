@@ -1,0 +1,4 @@
+links:
+  ## How to link $CHARM/src/* in your current $HOME/*
+  src:
+    ## All keys start from $CHARM_PATH/src, all values start from $HOME

@@ -1,0 +1,110 @@
+#!/bin/bash
+
+# LIVE_PROFILE_CACHE_PATH=~/.cache/live-profile
+# # ts() {                      # RFC-3339 + milliseconds  (GNU coreutils ≥ 8.21)
+# #     date +'%s%3N'
+# # }
+# # start=$(ts)
+
+# # log() { printf '%s  %s\n' "$(($(ts) - start))" "$*" >>/tmp/ssh-wrapper.log; }
+
+# # log "========================="
+# # log "start -- $0 $@"
+# # log "  caller: $(ps -p "$PPID" -o comm=)"
+# # log "  cwd: $PWD"
+
+
+
+
+# # Get the absolute path to the running script
+# EXNAME="${0##*/}"
+# LIVE_PROFILE_CACHE_PATH_FILE="$LIVE_PROFILE_CACHE_PATH"/"path-$EXNAME"
+
+
+# now=$(($(date +%s) - 2))
+# if mtime="$(stat -c %Y "$LIVE_PROFILE_CACHE_PATH_FILE" 2>/dev/null)" &&
+#     (( mtime > now )); then
+
+#     # touch "$LIVE_PROFILE_CACHE_PATH_FILE"
+#     next_candidate="$(cat "$LIVE_PROFILE_CACHE_PATH_FILE")"
+# else
+#     if ! [ -d "$LIVE_PROFILE_CACHE_PATH" ]; then
+#         mkdir -p "$LIVE_PROFILE_CACHE_PATH"
+#     fi
+
+#     SCRIPT_PATH="$(readlink -f "$0")"
+#     # log "PATH: $PATH"
+#     IFS=':' read -ra PATH_DIRS <<< "$PATH"
+
+#     next_candidate=
+#     found_ourselves=
+#     for dir in "${PATH_DIRS[@]}"; do
+#         # Skip if the directory is empty
+#         [ -n "$dir" ] || continue
+#         [ -d "$dir" ] || continue
+#         [ -x "$dir/$EXNAME" ] || continue
+#         # Check if an executable with the same name exists in this directory
+#         cmd_path="$(readlink -f "$dir/$EXNAME")"
+#         if [ "$cmd_path" == "$SCRIPT_PATH" ]; then
+#             # Found the script itself
+#             found_ourselves=1
+#             continue
+#         fi
+#         [ -n "$found_ourselves" ] || continue
+#         next_candidate="$cmd_path"
+#         break
+#     done
+
+#     if [ -z "$next_candidate" ]; then
+#         err "Error: Could not find the next '$EXNAME' in the PATH"
+#         exit 1
+#     fi
+#     printf "%s" "$next_candidate" > "$LIVE_PROFILE_CACHE_PATH"/path-"$EXNAME"
+
+# fi
+
+# # log finished path: "$next_candidate"
+
+# LIVE_PROFILE_CACHE_ENV_FILE="$LIVE_PROFILE_CACHE_PATH"/"cache-env"
+
+
+# if mtime=$(stat -c %Y "$LIVE_PROFILE_CACHE_ENV_FILE" 2>/dev/null) &&
+#     (( mtime > now )); then
+#     # touch "$LIVE_PROFILE_CACHE_ENV_FILE"
+#     env="$(cat "$LIVE_PROFILE_CACHE_ENV_FILE")"
+# else
+#     if ! [ -d "$LIVE_PROFILE_CACHE_PATH" ]; then
+#         mkdir -p "$LIVE_PROFILE_CACHE_PATH"
+#     fi
+
+    LIVE_PROFILE_LIB_PATHS=(
+        ~/.local/share/live-profile/lib.sh
+        /usr/share/live-profile/lib.sh
+    )
+
+    found=
+    for lib in "${LIVE_PROFILE_LIB_PATHS[@]}"; do
+        [ -e "$lib" ] && {
+            . "$lib"
+            found=1
+            break
+        }
+    done
+    if [ -z "$found" ]; then
+        echo "live-profile library not found." >&2
+        exit 1
+    fi
+
+
+    if ! env=$(live-profile:get); then
+        return 1
+    fi
+
+    printf "%s\n" "$env"
+    # printf "%s" "$env" > "$LIVE_PROFILE_CACHE_PATH"/cache-env
+    # log finish get-env >>/tmp/ssh-wrapper.log
+# fi
+
+# eval "$env"
+# # log finish env >>/tmp/ssh-wrapper.log
+# exec "$next_candidate" "$@"

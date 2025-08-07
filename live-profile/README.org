@@ -1,0 +1,20 @@
+# -*- ispell-local-dictionary: "english" -*-
+
+
+* Usage
+
+** Live profile
+
+=live-profile= is a simple way to ensure some environment variables
+gets added to the call of another binary at call time, ensuring
+evaluation and possibly updated environment.
+
+For instance, this allows to add system features loaded on the fly, as
+ssh-agent, or proxy settings that will be readily available as soon as
+you change them and in long run software (ie: emacs server mode, using
+ssh through git, magit).
+
+Just add in files in ~~/.config/live-profile/*.sh~ and make sure to
+add a link to ~live-profile-run~ with the name of the command you want
+to upgrade in a directory in front of the PATH resolution
+algorithm: this will ensure that it gets called before.
