@@ -131,6 +131,20 @@ action = "None"
 key = "Space"
 mods = "Control|Shift"
 
+## Same, I don't need to search forward or backwards in the scroll history
+## of alacritty
+
+[[keyboard.bindings]]         # disable Ctrl-Shift-F (SearchForward)
+key    = "F"
+mods   = "Control|Shift"
+action = "None"
+
+[[keyboard.bindings]]         # disable Ctrl-Shift-B (SearchBackward)
+key    = "B"
+mods   = "Control|Shift"
+action = "None"
+
+
 [[keyboard.bindings]]
 action = "IncreaseFontSize"
 key = "Plus"
