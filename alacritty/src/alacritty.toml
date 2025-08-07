@@ -46,7 +46,7 @@ mods = "Control|Shift"
 [[keyboard.bindings]]
 chars = "\u0002\""
 key = "o"
-mods = "control|shift"
+mods = "Control|Shift"
 
 [[keyboard.bindings]]
 chars = "\u0002c"
@@ -151,9 +151,9 @@ key = "Plus"
 mods = "Control|Shift"
 
 
-
 [scrolling]
 history = 0
+
 
 [terminal.shell]
 args = ["new-session", "-A", "-s", "main"]
