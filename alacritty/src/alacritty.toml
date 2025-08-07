@@ -170,4 +170,14 @@ import = [
   "~/.config/alacritty/local.toml",
 ]
 
+
 [terminal]
+
+[[hints.enabled]]
+command = "xdg-open"
+hyperlinks = true
+post_processing = true
+persist = false
+mouse.enabled = true
+regex = "(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:|file:|git://|ssh:|ftp://)[^\u0000-\u001F\u007F-\u009F<>\"\\s{-}\\^⟨⟩`]+"
+binding = { key = "L", mods = "Control|Shift" }
