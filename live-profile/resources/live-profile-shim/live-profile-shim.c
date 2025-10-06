@@ -13,6 +13,8 @@
 #include <unistd.h>
 #include <inttypes.h>
 #include <sys/wait.h>
+#include <pwd.h>
+#include <sys/types.h>
 
 #define TTL 2                     /* re-compute cache after N seconds */
 #define CACHE_DIR "/.cache/live-profile"
@@ -49,6 +51,132 @@ static char *strdup_stripnewline(char *s)
     size_t n = strcspn(s, "\r\n");
     s[n] = '\0';
     return strdup(s);
+}
+
+static int mkdir_p(const char *path, mode_t mode)
+{
+    char tmp[PATH_MAX];
+    size_t len = strlen(path);
+    if (len == 0 || len >= sizeof(tmp)) {
+        errno = ENAMETOOLONG;
+        return -1;
+    }
+
+    memcpy(tmp, path, len + 1);
+    if (len == 1 && tmp[0] == '/')
+        return 0;
+
+    if (tmp[len - 1] == '/')
+        tmp[len - 1] = '\0';
+
+    for (char *p = tmp + 1; *p; ++p) {
+        if (*p == '/') {
+            *p = '\0';
+            if (mkdir(tmp, mode) == -1 && errno != EEXIST)
+                return -1;
+            *p = '/';
+        }
+    }
+
+    if (mkdir(tmp, mode) == -1 && errno != EEXIST)
+        return -1;
+
+    return 0;
+}
+
+static bool probe_dir_writable(const char *dir)
+{
+    char templ[PATH_MAX];
+    int ret = snprintf(templ, sizeof(templ), "%s/.permXXXXXX", dir);
+    if (ret < 0 || (size_t)ret >= sizeof(templ)) {
+        errno = ENAMETOOLONG;
+        return false;
+    }
+
+    int fd = mkstemp(templ);
+    if (fd == -1)
+        return false;
+
+    close(fd);
+    unlink(templ);
+    return true;
+}
+
+static int ensure_parent_dir(const char *path)
+{
+    char buf[PATH_MAX];
+    int ret = snprintf(buf, sizeof(buf), "%s", path);
+    if (ret < 0 || (size_t)ret >= sizeof(buf)) {
+        errno = ENAMETOOLONG;
+        return -1;
+    }
+
+    char *dir = dirname(buf);
+    if (!dir) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    return mkdir_p(dir, 0755);
+}
+
+static bool ensure_dir_and_probe(const char *dir)
+{
+    if (mkdir_p(dir, 0755) == -1)
+        return false;
+
+    return probe_dir_writable(dir);
+}
+
+static bool fallback_tmp_cache(char *cache, size_t cache_size, const char *exename)
+{
+    const char *user = getenv("USER");
+    if (!user || !*user) {
+        struct passwd *pw = getpwuid(getuid());
+        user = pw ? pw->pw_name : "unknown";
+    }
+
+    char tmpl[PATH_MAX];
+    int ret = snprintf(tmpl, sizeof(tmpl), "/tmp/live-profile.%s.XXXX.tmp", user);
+    if (ret < 0 || (size_t)ret >= sizeof(tmpl)) {
+        errno = ENAMETOOLONG;
+        return false;
+    }
+
+    if (!mkdtemp(tmpl))
+        return false;
+
+    if (!probe_dir_writable(tmpl))
+        return false;
+
+    ret = snprintf(cache, cache_size, "%s/%s.path-env", tmpl, exename);
+    if (ret < 0 || (size_t)ret >= cache_size) {
+        errno = ENAMETOOLONG;
+        return false;
+    }
+
+    return true;
+}
+
+static bool select_cache_path(char *cache, size_t cache_size, const char *home, const char *exename)
+{
+    char cache_dir[PATH_MAX];
+    int ret = snprintf(cache_dir, sizeof(cache_dir), "%s%s", home, CACHE_DIR);
+    if (ret < 0 || (size_t)ret >= sizeof(cache_dir)) {
+        errno = ENAMETOOLONG;
+        return false;
+    }
+
+    if (ensure_dir_and_probe(cache_dir)) {
+        ret = snprintf(cache, cache_size, "%s/%s.path-env", cache_dir, exename);
+        if (ret < 0 || (size_t)ret >= cache_size) {
+            errno = ENAMETOOLONG;
+            return false;
+        }
+        return true;
+    }
+
+    return fallback_tmp_cache(cache, cache_size, exename);
 }
 
 /* ---- find next git in $PATH after *our* directory ------------------- */
@@ -118,11 +246,10 @@ static int write_cache_from_helper(const char *cache, const char *git_path)
       fprintf(stderr, "cache path too long\n");
       return -1;
     }
-    sprintf(tmp, "%s.tmp.XXXXXX", cache);
+    snprintf(tmp, sizeof(tmp), "%s.tmp.XXXXXX", cache);
     /* ensure cache dir exists */
-    char *dir = dirname(strdup(cache));
-    if (mkdir(dir, 0755) == -1 && errno != EEXIST) {
-      fprintf(stderr, "mkdir %s failed: %s\n", dir, strerror(errno));
+    if (ensure_parent_dir(cache) == -1) {
+      fprintf(stderr, "failed to prepare cache directory for %s: %s\n", cache, strerror(errno));
       return -1;
     }
     /* create temp file */
@@ -167,7 +294,14 @@ int main(int argc, char **argv, char **envp)
     char cache[PATH_MAX];
 
     const char *exename = basename(argv[0]);
-    snprintf(cache, sizeof(cache), "%s%s/%s.path-env", home, CACHE_DIR, exename);
+    if (!select_cache_path(cache, sizeof(cache), home, exename)) {
+      int err = errno;
+      char msg[PATH_MAX * 2];
+      snprintf(msg, sizeof(msg),
+               "unable to use %s%s or /tmp fallback: %s",
+               home, CACHE_DIR, strerror(err));
+      die(msg);
+    }
 
     char *next_exec = NULL;
 
