@@ -108,15 +108,29 @@ static bool read_cache(const char *cache, char **git_path)
 /* ---- write cache file -------------------------------------------- */
 static int write_cache_from_helper(const char *cache, const char *git_path)
 {
-  if (!git_path) return -1;        /* safety */
+    if (!git_path) {
+      fprintf(stderr, "git_path is NULL\n");
+      return -1;        /* safety */
+    }
     char tmp[PATH_MAX];
     size_t need = strlen(cache) + sizeof(".tmp.XXXXXX");
-    if (need >= sizeof(tmp)) return -1;
-
+    if (need >= sizeof(tmp)) {
+      fprintf(stderr, "cache path too long\n");
+      return -1;
+    }
     sprintf(tmp, "%s.tmp.XXXXXX", cache);
+    /* ensure cache dir exists */
+    char *dir = dirname(strdup(cache));
+    if (mkdir(dir, 0755) == -1 && errno != EEXIST) {
+      fprintf(stderr, "mkdir %s failed: %s\n", dir, strerror(errno));
+      return -1;
+    }
+    /* create temp file */
     int fd = mkstemp(tmp);                 /* open temp file             */
-    if (fd == -1) return -1;
-
+    if (fd == -1) {
+      fprintf(stderr, "mkstemp failed in %s: %s\n", tmp, strerror(errno));
+      return -1;
+    }
     /* 1️⃣ our own line --------------------------------------------- */
     dprintf(fd, "%s\n", git_path);
 
@@ -137,6 +151,7 @@ static int write_cache_from_helper(const char *cache, const char *git_path)
     close(fd);
     if (!WIFEXITED(status) || WEXITSTATUS(status)) {
         unlink(tmp);                       /* helper failed */
+        fprintf(stderr, "live-profile failed\n");
         return -1;
     }
     return rename(tmp, cache);             /* atomic move */
