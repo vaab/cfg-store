@@ -86,6 +86,33 @@ uses:
     constraint: required
 ```
 
+### Relations (Cross-Module Integration)
+
+When a module needs to provide configuration or integration for another module, it uses the `relations/` directory:
+
+```
+module-name/
+├── relations/
+│   └── other-module/                  # Files specific to other-module integration
+│       └── config-file
+└── hooks/
+    └── other-module-relation-joined   # Executed when both modules are deployed
+```
+
+The `hooks/<other-module>-relation-joined` script is executed when both the current module and `<other-module>` are deployed. In these scripts, `$PWD` is set to the charm root directory.
+
+Example (from `activity-memo/hooks/kitty-relation-joined`):
+
+```bash
+#!/bin/bash
+set -eu
+
+TARGET="$HOME/.config/kitty/open-actions.conf"
+SOURCE="$PWD/relations/kitty/open-actions.conf"
+
+ln -sf "$SOURCE" "$TARGET"
+```
+
 ### Live-Profile System
 
 The core dynamic environment system (`live-profile/`) injects environment variables at command execution time via compiled C shims. This enables runtime reconfiguration without restarting long-running processes (e.g., Emacs).

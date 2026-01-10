@@ -154,6 +154,36 @@ The =bash= module uses numbered scripts in =bashrc.d/= for ordered loading:
 
 Disable a script by adding =.disable= extension.
 
+** Relations (Cross-Module Integration)
+
+When a module needs to provide configuration or integration for another
+module, it uses the =relations/= directory:
+
+#+begin_example
+module-name/
+├── relations/
+│   └── other-module/     # Files specific to other-module integration
+│       └── config-file
+└── hooks/
+    └── other-module-relation-joined  # Executed when both modules are deployed
+#+end_example
+
+The =hooks/<other-module>-relation-joined= script is executed when both
+the current module and =<other-module>= are deployed. In these scripts,
+=$PWD= is set to the charm root directory.
+
+Example (from =activity-memo/hooks/kitty-relation-joined=):
+
+#+begin_src bash
+#!/bin/bash
+set -eu
+
+TARGET="$HOME/.config/kitty/open-actions.conf"
+SOURCE="$PWD/relations/kitty/open-actions.conf"
+
+ln -sf "$SOURCE" "$TARGET"
+#+end_src
+
 ** Live-Profile System
 
 The =live-profile= module provides dynamic environment injection at command
