@@ -1,0 +1,53 @@
+[user]
+	name = Valentin Lab
+	email = valentin.lab@kalysto.org
+	signingkey = /home/vaab/.ssh/keys/vaab-0k_id_ed25519.pub
+[color]
+	branch = auto
+	diff = auto
+	interactive = auto
+	status = auto
+[gui]
+	fontui = -family helvetica -size 11 -weight bold -slant roman -underline 0 -overstrike 0
+	fontdiff = -family courier -size 10 -weight normal -slant roman -underline 0 -overstrike 0
+[push]
+	default = tracking
+[core]
+	whitespace = fix
+	excludesfile = ~/.config/git/ignore
+
+[alias]
+	co = checkout
+	com = commit
+	st = status
+        ci = commit
+	ignored = !git sub st ls-files -v | grep \"^[[:lower:]]\"
+
+
+[merge]
+	conflictstyle = diff3
+        ff = only
+[pull]
+	ff = only
+	rebase = true
+[rebase]
+	autosquash = true
+	autostash = false
+[init]
+	templatedir = ~/.gittemplate
+[safe]
+	directory = /srv/datastore/config/gogocarto1/opt/apps/gogocarto
+	directory = /srv/datastore/data/joomla/opt/apps/joomla
+	directory = /home/vaab/dev/php/opensem2
+	directory = /srv/datastore/config/opensem_service/opt/apps/opensem
+[github]
+	user = vaab
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	allowedSignersFile = /home/vaab/.ssh/allowed_signers
+	program = git-ssh-keygen
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = false

@@ -1,0 +1,6 @@
+links:
+  ## How to link $CHARM/src/* in your current $HOME/*
+  src:
+    ## All keys start from $HOME, all values start from $CHARM_PATH/src
+    .: .config/git
+
