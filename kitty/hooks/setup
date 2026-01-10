@@ -1,0 +1,24 @@
+#!/bin/bash
+
+link:bin:if_exists() {
+    local path="$1"
+
+    dirname="${path%/*}"
+    if [[ "${dirname##*/}" == "sbin" ]]; then
+        echo "Need root to link $path to /usr/local/sbin:"
+        sudo ln -sfv "$path" /usr/local/sbin/ || return 1
+        return 0
+    fi
+    if [ -e "$path" ]; then
+        ln -sfv "$path" ~/".local/bin/"
+    else
+        echo "Not found $path" >&2
+        return 1
+    fi
+}
+
+set -e
+
+
+link:bin:if_exists ~/dev/go/kitty/kitty/launcher/kitty
+

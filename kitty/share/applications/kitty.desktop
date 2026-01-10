@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Name=Kitty
+Icon=kitty.svg
+Exec=kitty
+StartupNotify=false
+StartupWMClass=Kitty
+OnlyShowIn=Unity;Unity7;ubuntu;
+X-Unity-Generated=true
