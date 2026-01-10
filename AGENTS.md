@@ -13,6 +13,7 @@ Before any commit, verify that changes do NOT contain:
 - Public IP addresses or network configurations exposing infrastructure
 - Database credentials or connection strings
 - Any file matching: `.env`, `credentials.*`, `secret.*`, `*.pem`, `*.key`
+- Files matching `*/doc/admin.org` (personal notes, not for version control)
 
 Note: Short hostnames (e.g., `wen`, `kahn`, `yin`) used for per-host configuration are acceptable.
 
