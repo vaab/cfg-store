@@ -25,7 +25,7 @@ cd resources/live-profile-shim || return 1
 gcc -std=c11 -O2 -Wall -Wextra -o live-profile-shim live-profile-shim.c || return 1
 mv live-profile-shim live-profile-shim-${HOSTNAME}
 
-for target in ~/.local/bin/{ssh{,-add},git}; do
+for target in ~/.local/bin/{ssh{,-add},git,scp,ssh-keygen}; do
   ln -sf "$CHARM_PATH/resources/live-profile-shim/live-profile-shim-${HOSTNAME}" "$target"
 done
 
