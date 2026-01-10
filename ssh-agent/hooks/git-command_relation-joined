@@ -1,0 +1,4 @@
+#!/bin/bash
+
+ln -sf "$PWD/relations/git/git-ssh-keygen" ~/.local/bin/git-ssh-keygen
+git config --global gpg.ssh.program "git-ssh-keygen"
