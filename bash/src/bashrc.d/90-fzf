@@ -1,9 +1,63 @@
 # -*- mode: shell-script -*-
 
+## XXXvlab: can't use BLE_ATTACHED since it is not defined yet even
+## when ble.sh is loaded. Use type -t ble-attach instead.
+if type -t ble-attach >/dev/null 2>&1; then
+    return  ## ble loads its own fzf config
+fi
+
+if ! type -p fzf >/dev/null 2>&1 ; then
+    echo "Warning: fzf not found in PATH. Ignoring 'fzf' bash config." >&2
+    echo "  Install with:" >&2
+    echo "    apt-get install fzf" >&2
+    return
+fi
+
+
+if ! type -p fd >/dev/null 2>&1 ; then
+    echo "Warning: fd not found in PATH. Ignoring 'fzf' bash config." >&2
+    echo "  Install with:" >&2
+    echo "    apt-get install fd-find" >&2
+    return
+fi
+
 
 export FZF_DEFAULT_OPTS="--color 'fg:#bbccdd,fg+:#ddeeff,bg:#111820,preview-bg:#223344,border:#778899'"
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
-bind '"\C-t": transpose-chars'
+export LOCAL_FZF_CLONE="$HOME/dev/go/fzf"
+if [ -d "$LOCAL_FZF_CLONE" ]; then
+    export PATH="$HOME/dev/go/fzf/bin:$PATH"
+    #echo "source $LOCAL_FZF_CLONE/shell/completion.bash" >&2
+    source "$LOCAL_FZF_CLONE/shell/completion.bash"
+    source "$LOCAL_FZF_CLONE/shell/key-bindings.bash"
+
+    ## Setting the following breaks \C-r of fzf !
+    ##   bash_execute_unix_command: cannot find keymap for command
+    # bind '"\C-t": transpose-chars'
+
+    ## Setting the following make \C-t fail with:
+    ##   transpose-chars: command not found
+    # bind -m emacs-standard -x '"\C-t": transpose-chars'
+
+    ## Only valid solution for now:
+    #sed -r -i.orig 's/C-t/C-f/g' "$LOCAL_FZF_CLONE/shell/key-bindings.bash"
+
+elif [ -d /usr/share/doc/fzf ]; then
+
+    ## XXXvlab: standard installation needs to be patched to prevent replacing \C-t
+    #sudo sed -r -i.orig 's/C-t/C-f/g' /usr/share/doc/fzf/examples/key-bindings.bash
+    #sudo ln -sf "$(which fdfind)" /usr/local/bin/fd
+
+    if [ -e /usr/share/doc/fzf/examples/completion.bash ]; then
+        . /usr/share/doc/fzf/examples/completion.bash
+    fi
+    if [ -e /usr/share/doc/fzf/examples/key-bindings.bash ]; then
+        . /usr/share/doc/fzf/examples/key-bindings.bash
+    fi
+else
+    echo "Warning: fzf not found in PATH or in /usr/share/doc/fzf."
+    return
+fi
+

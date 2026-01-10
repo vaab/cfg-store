@@ -1,13 +1,15 @@
 # -*- mode: shell-script -*-
 
+BASH_UUID=$(uuidgen) || return 1
+
 # Prompt easy management
 prompt() {
-	prompt_name="prompt.$1.rc"
+    prompt_name="prompt.$1.rc"
 
-	for i in /etc/prompt ~/.prompt; do
-		[ -f "$i/$prompt_name" ] &&
-			. "$i/$prompt_name"
-	done
+    for i in /etc/prompt ~/.prompt; do
+        [ -f "$i/$prompt_name" ] &&
+            . "$i/$prompt_name"
+    done
 }
 
 
@@ -26,9 +28,12 @@ glog () {
 
 
 path-prepend() {
-    local path
+    local path paths count i
+    paths=("$@")
+    count=${#paths[@]}
     ## Add a path to the beginning of the PATH, and remove any duplicates
-    for path in "$@"; do
+    for (( i=${count}-1; i>=0; i-- )); do
+        path="${paths[i]}"
         [ -d "$path" ] || continue
         PATH=":$PATH:"; PATH="${PATH//:$path:/:}" ; PATH="${PATH:1:-1}"
         PATH="$path:$PATH"
@@ -36,27 +41,30 @@ path-prepend() {
     export PATH
 }
 
-
 autoload() {
-    local label="$1" exec="$2"
+    local label="$1" exec="$2" init_fn_label idx
     local autoload_ref i
     shift 2
     [ "$(type -t "__init_$label")" = function ] && return
 
     declare -n autoload_ref=__autoload_${label}_commands
     autoload_ref=("$@")
+    init_fn_label=___my_init_${label}
     eval "
-        __init_$label() {
+        ${init_fn_label}() {
             local i
             for i in \"\${__autoload_${label}_commands[@]}\"; do
                 unalias \"\$i\"
             done
-            $exec
             unset __autoload_${label}_commands
-            unset -f __init_${label}
+            unset -f ${init_fn_label}
+            [ -n "$AUTOLOAD_DEBUG" ] && echo \"autoloading: ${label}\" >&2
+            $exec
         }
     "
     for i in "$@"; do
-        alias "$i"="__init_${label} && $i"
+        [ -n "$AUTOLOAD_DEBUG" ] && echo "aliasing $i to ${init_fn_label} && $i" >&2
+        # alias "$i"="echo \"BASH FUNC: '\${FUNCNAME[@]}' from '\${BASH_SOURCE[1]}'\" && ${init_fn_label} && $i"
+        alias "$i"="${init_fn_label} && $i"
     done
 }

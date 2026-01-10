@@ -1,4 +1,9 @@
 # -*- mode: shell-script -*-
 
-export EDITOR=emacs
+export EDITOR="et"
 export VISUAL="et"
+
+## Note: the following will require:
+## $ sudo visudo   # and add the following line
+## Defaults   env_keep += "SYSTEMD_EDITOR"
+export SYSTEMD_EDITOR="vim"

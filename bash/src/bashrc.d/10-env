@@ -3,7 +3,7 @@
 ## General environment variable should be defined here
 ## They should not be linked to a particular tool or command line.
 
-export TERM=xterm-256color
+#export TERM=xterm-256color
 export LC_ALL=en_US.UTF-8
 
 path-prepend /{opt/merge/,usr/{local/,},}{s,}bin

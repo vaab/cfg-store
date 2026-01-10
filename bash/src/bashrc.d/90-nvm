@@ -3,6 +3,11 @@
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
 
-autoload nvm "source $NVM_DIR/nvm.sh" tnx ns nvm node npm yarm gulp grunt webpack npx pkg
+declare -A bin_autoload=()
+for bin in ~/.nvm/versions/node/*/bin/*; do
+    bin_autoload["${bin##*/}"]=1
+done
+bin_autoload["switch-to-dev"]=1
+bin_autoload["pkg"]=1
 
-
+autoload nvm "source $NVM_DIR/nvm.sh" "${!bin_autoload[@]}"

@@ -1,22 +1,85 @@
 # -*- mode: shell-script -*-
 
-__ps1_elapsed_start_file="/tmp/ps1_elapsed_start.$$"
+
+csi=$'\e['
+
+declare -A __ps1_color=(
+    ["black"]="0;30"
+    ["red"]="0;31"
+    ["green"]="0;32"
+    ["yellow"]="0;33"
+    ["blue"]="0;34"
+    ["pink"]="0;35"
+    ["cyan"]="0;36"
+    ["white"]="0;37"
+    ["gray"]="1;30"
+    ["lred"]="1;31"
+    ["lgreen"]="1;32"
+    ["lyellow"]="1;33"
+    ["lblue"]="1;34"
+    ["lpink"]="1;35"
+    ["lcyan"]="1;36"
+    ["lwhite"]="1;37"
+)
+
+__ps1_color_1="2;15;15;20"
+__ps1_color_2="2;25;25;40"
+__ps1_color_3="2;0;0;0"
+__ps1_bg_1="48;2;20;20;30"
+__ps1_bg_2="48;2;20;20;30"
+__ps1_bg_3="48;2;0;0;0"
+
 
 if [ -f ~/.config/bash/lib/preexec ]; then
-    ## This allows to timestamp the moment the command is entered
+
+    ##
+    ## Timestamp the moment the command is entered
+    ##
+
+    __ps1_elapsed_start_file="/tmp/bash/$BASH_UUID/ps1_elapsed_start.$$"
 
     source ~/.config/bash/lib/preexec
     preexec_timestamp_cmd() {
-        printf "\e[s\e[A\e[${COLUMNS:-$(tput cols)}C\e[21D\e[1;36m⊽ %(%Y-%m-%d %H:%M:%S)T\e[0m╮\e[u" -1
+        # echo BASH_COMMAND: $BASH_COMMAND
+        # [ "$BASH_COMMAND" == "__fzf_history__" ] && return
+        local cols=${COLUMNS:-$(tput cols)}
+        local right_part_len=23
+        local left_prefix=4
+        if [[ "${#BASH_COMMAND}" -gt "$((cols - right_part_len - left_prefix - 1))" ]] &&
+               [[ "${#BASH_COMMAND}" -le "$((cols - left_prefix))" ]]; then
+            echo
+        fi
+        printf "\e[s\e[A\e[${cols}C\e[${right_part_len}D${csi}48;${__ps1_color_3};38;${__ps1_color_2}m:${csi}0;30m${csi}48;${__ps1_color_2}m %(%Y-%m-%d %H:%M:%S)T \e[0;30m╮\e[u" -1
+        [ -d "${__ps1_elapsed_start_file%/*}" ] ||
+            mkdir -p "${__ps1_elapsed_start_file%/*}"
         cat /proc/uptime > "$__ps1_elapsed_start_file"
     }
-    # precmd() {
-    #     ## XXXvlab: could we calculate the time it took to execute the command ?
-    #     :
-    # }
 
-    preexec_functions+=(preexec_timestamp_cmd)
+    ## Add if not already there
+    if ! [[ " ${preexec_functions[*]} " == *" preexec_timestamp_cmd "* ]]; then
+        preexec_functions+=(preexec_timestamp_cmd)
+    fi
 
+    ##
+    ## Catch rogue prefix to PS1 and store them in a dedicated place
+    ##
+
+    __ps1_new_prefix_file="/tmp/ps1_new_prefix.$$"
+
+    precmd_check_for_PS1_prefix() {
+        local prefix
+        OLD_COLUMNS="${COLUMNS:-$(tput cols)}"
+        if [ "$PS1" != "$ORIGINAL_PS1" ] && [[ "$PS1" == *"$ORIGINAL_PS1" ]]; then
+            [ -d "${__ps1_new_prefix_file%/*}" ] ||
+                mkdir -p "${__ps1_new_prefix_file%/*}"
+            echo -n "${PS1%$ORIGINAL_PS1}" > "$__ps1_new_prefix_file"
+        fi
+    }
+
+    ## Add if not already there
+    if ! [[ " ${precmd_functions[*]} " == *" precmd_check_for_PS1_prefix "* ]]; then
+        precmd_functions+=(precmd_check_for_PS1_prefix)
+    fi
 fi 
 
 prompt_indicator=()
@@ -32,6 +95,19 @@ if type -p git >/dev/null 2>&1; then
     prompt_indicator+=("parse_git_branch")
 fi
 
+
+
+winchg() {
+    local cols=${COLUMNS:-$(tput cols)}
+    if [ "$cols" -lt "$OLD_COLUMNS" ]; then
+        ## delete 2 lines up because the terminal probably wrapped our prompt in 2 lines
+        printf "\e[s\e[A\e[A\e[G\e[K\e[u\e[J"
+    fi
+    printf "\e[s\e[A\e[G$(__ps1)\e[u"
+    OLD_COLUMNS=$cols
+}
+
+trap 'winchg' WINCH
 
 if [ -n "$PROMPT_COMMAND_PREV" ]; then
     PROMPT_COMMAND="${PROMPT_COMMAND_PREV}"
@@ -110,21 +186,60 @@ print_duration() {
     printf "$fmt" "$S"
 }
 
+__ps1_right_segs=(
+    "${csi}48;${__ps1_color_3};38;${__ps1_color_1}m:"
+    "${csi}0;31m${csi}48;${__ps1_color_1}m:\$(__ps1:seg:pipe_status "\${pipestatus[@]}") "
+    "${csi}0;30m${csi}48;${__ps1_color_1}m:\$(__ps1:seg:elapsed) "
+    "${csi}48;${__ps1_color_1};38;${__ps1_color_2}m:"
+    "${csi}0;36m${csi}48;${__ps1_color_2}m: \$(current_time) "
+    "${csi}0;30m:╯"
+)
+
 __ps1:right() {
+    local pipestatus=("$@")
+    local csi=$'\e['
+    local len=0
+    local seg
+
+    out=""
+    for seg in "${__ps1_right_segs[@]}"; do
+        seg=$(eval printf "\"$seg\"")
+        color=${seg%%:*}
+        seg=${seg#*:}
+        (( len += ${#seg} ))
+        out+="${color}${seg}"
+    done
+    echo -n "$((len - 1)):$out"
+}
+
+
+__ps1_left_segs=(
+    "${csi}${__ps1_color[gray]}m:╭"
+    "${csi}${__ps1_bg_1}m${csi}${__ps1_color[gray]}m: \$USER"
+    "${csi}${__ps1_color[white]}m${csi}${__ps1_bg_1}m:@"
+    "${csi}${__ps1_bg_1}m${csi}${__ps1_color[gray]}m:\$HOSTNAME "
+    "${csi}48;${__ps1_color_1};38;${__ps1_color_2}m:"
+    "${csi}48;${__ps1_color_1}m${csi}${__ps1_color[lblue]}m: \$(__ps1:seg:directory) "
+    "${csi}48;${__ps1_color_3};38;${__ps1_color_1}m:"
+)
+
+__ps1:left() {
     local csi=$'\e['
     local len=0
     local seg
 
     out=""
 
-    for seg in "0;31m:$(__ps1:seg:pipe_status "$@") " "0;33m:$(__ps1:seg:elapsed) "  "0;36m:⊻ $(current_time)" "0m:╯"; do
+    for seg in "${__ps1_left_segs[@]}"; do
+        seg=$(eval printf "\"$seg\"")
         color=${seg%%:*}
         seg=${seg#*:}
         (( len += ${#seg} ))
-        out+="${csi}${color}${seg}"
+        out+="${color}${seg}"
     done
     echo -n "$((len - 1)):$out"
 }
+
 
 unset __ps1_DIRECTORY_ALIAS
 declare -A __ps1_DIRECTORY_ALIAS=(
@@ -146,28 +261,41 @@ __ps1:seg:directory() {
 
 __ps1() {
     local csi=$'\e['
-    local up="${csi}s"
+    # local up="${csi}s"
     local eol="${csi}${COLUMNS:-$(tput cols)}C"
-    echo -n "${up}${eol}"
+    # echo -n "${up}"
     ## Right part
     local right_part
     right_part=$(__ps1:right "$@")
     right_part_len=${right_part%%:*}
     right_part=${right_part#*:}
 
+    left_part=$(__ps1:left)
+    left_part_len=${left_part%%:*}
+    left_part=${left_part#*:}
+
+    cols=${COLUMNS:-$(tput cols)}
+    echo -n "${left_part}${csi}1;30m${csi}38;${__ps1_color_1}m${csi}0;30m"
+    local filler_size=$((cols - left_part_len - right_part_len - 2))
+    for ((i = 0; i < filler_size; i++)); do
+        echo -n "─"
+    done
+    echo -n "${eol}"
     echo -n "${csi}${right_part_len}D"
     echo -n "${right_part}"
-    echo -n "${csi}u"
-    
+    # echo -n "${csi}u"
+    echo -n "." >> /tmp/ps1.called
     ## Left part
-    echo -n "╭${csi}1;30m$USER${csi}0;37m@${csi}1;30m$HOSTNAME${csi}0;37m]"
-    echo -n "-[${csi}1;34m$(__ps1:seg:directory)${csi}0;37m]"
+    # echo -n "╭${csi}1;30m$USER${csi}0;37m@${csi}1;30m$HOSTNAME${csi}0;37m]"
+    # echo -n "-[${csi}1;34m$(__ps1:seg:directory)${csi}0;37m]"
+    # echo -n "${right_part}"
     # echo -n "$(insert_prompt_indicator)"
     echo
 }
 
 
-PS1='$(__ps1 "${PIPESTATUS[@]}")\n╰\[\e[1;37m\]\$ \[\e[0;37m\]'
+PS1='$(__ps1 "${PIPESTATUS[@]}")\n╰ \[\e[1;37m\]\$ \[\e[0;37m\]'
+ORIGINAL_PS1="$PS1"
 # set-ps1() {
 #     local up="\e[s"
 #     local eol="\e[\${COLUMNS:-$(tput cols)}C"

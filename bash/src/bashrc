@@ -8,6 +8,7 @@
 ##
 ## This file is not read if bash is called via "sh" !!
 
+BASH_INCLUDE_PATH=~/.config/bash/bashrc.d
 
 # If not running interactively, don't do anything
 case $- in
@@ -16,7 +17,7 @@ case $- in
 esac
 
 to_load=()
-for file in ~/.config/bash/bashrc.d/{private/{host/"$HOSTNAME"/,},host/"$HOSTNAME"/,}* ; do
+for file in "$BASH_INCLUDE_PATH"/{private/{host/"$HOSTNAME"/,},host/"$HOSTNAME"/,}* ; do
     [ -r "$file" ] || continue
     [ -f "$file" ] || continue
     [ -d "$file" ] && continue
@@ -49,10 +50,11 @@ if [ -n "$BASH_PROFILE" ]; then
         return $errlvl
     }
     for prio_file in "${to_load[@]}"; do
-        time_exec source "${prio_file#*:}" || echo "Failed to load: ${prio_file#*:}"
+        time_exec source "${prio_file#*:}" || echo "Failed to load: ${prio_file#*:}" >&2
     done
 else
     for prio_file in "${to_load[@]}"; do
-        source "${prio_file#*:}" || echo "Failed to load: ${prio_file#*:}"
+        source "${prio_file#*:}" || echo "Failed to load: ${prio_file#*:}" >&2
     done
 fi
+

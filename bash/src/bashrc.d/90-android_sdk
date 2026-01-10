@@ -1,6 +1,7 @@
 # -*- mode: shell-script -*-
 
 export ANDROID_HOME=/opt/apps/android-sdk
+export ANDROID_SDK_ROOT=$ANDROID_HOME
 
 path-prepend "$ANDROID_HOME/platform-tools"
 path-prepend "$ANDROID_HOME/tools"

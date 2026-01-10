@@ -1,9 +1,10 @@
 # -*- mode: shell-script -*-
 
-if ! type -p pyenv >/dev/null 2>&1; then
-    echo "Warning: pyenv not found, skipping."
+if ! [ -d "$HOME/dev/python/pyenv" ]; then
+    echo "Warning: pyenv not found in '$HOME/dev/python/pyenv', skipping."
     return
 fi
+
 export PYENV_ROOT="$HOME/dev/python/pyenv"
 export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 

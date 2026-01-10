@@ -1,6 +1,5 @@
 # -*- mode: shell-script -*-
 
-if [ -e /home/vaab/.nix-profile/etc/profile.d/nix.sh ]; then 
-    . /home/vaab/.nix-profile/etc/profile.d/nix.sh; 
+if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then
+    . ~/.nix-profile/etc/profile.d/nix.sh
 fi
-
