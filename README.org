@@ -1,0 +1,174 @@
+# -*- ispell-local-dictionary: "english" -*-
+
+#+TITLE: Modular Dotfiles Collection
+#+AUTHOR: vaab
+
+* Overview
+
+This repository contains a modular collection of dotfiles and
+configuration managed by [[https://github.com/0k/0k-cfg][0k-cfg]]. Each directory is a self-contained
+*charm* (module) that manages configuration for a specific tool or
+service.
+
+*This repository is intended to be shared publicly.* It must never
+contain sensitive information such as passwords, API keys, private
+keys, or personal data.
+
+* Quick Start
+
+** Prerequisites
+
+Install the required dependencies:
+
+#+begin_src sh
+## Shell libraries (from https://deb.kalysto.org/)
+cat <<EOF | sudo tee /etc/apt/sources.list.d/kalysto.org.list
+deb https://deb.kalysto.org no-dist kal-alpha kal-beta kal-main
+EOF
+
+wget -O - https://deb.kalysto.org/conf/public-key.gpg | sudo apt-key add -
+sudo apt-get update
+
+## Required packages
+sudo apt-get install ripgrep plocate
+#+end_src
+
+Clone the required repositories:
+
+#+begin_src sh
+mkdir -p ~/dev/sh
+git clone <0k-cfg-repo> ~/dev/sh/0k-cfg
+git clone <kal-shlib-common-repo> ~/dev/sh/kal-shlib-common
+#+end_src
+
+Link the =cfg= command:
+
+#+begin_src sh
+mkdir -p ~/.local/bin
+ln -sf ~/dev/sh/0k-cfg/src/bin/cfg ~/.local/bin/
+#+end_src
+
+Ensure =~/.local/bin= is in your =PATH=.
+
+** Deploying a Module
+
+To deploy a configuration module:
+
+#+begin_src sh
+cfg setup <module-name>
+#+end_src
+
+For example:
+
+#+begin_src sh
+cfg setup tmux          # Deploy tmux configuration
+cfg setup bash          # Deploy bash configuration
+cfg setup emacs         # Deploy emacs configuration
+#+end_src
+
+* Module Structure
+
+Each module follows this structure:
+
+#+begin_example
+module-name/
+├── metadata.yml      # Linking rules and dependencies
+├── hooks/
+│   ├── setup         # Executed after linking
+│   └── install       # Pre-requisite checks
+├── src/              # Config files (symlinked per metadata.yml)
+├── bin/              # Executables (auto-linked to ~/.local/bin/)
+├── share/            # Shared data (auto-linked, see below)
+└── relations/        # Cross-module integration files
+#+end_example
+
+** Automatic Linking
+
+Beyond =metadata.yml= rules, =cfg= automatically links certain directories:
+
+| Source                 | Destination                    | Notes                            |
+|------------------------+--------------------------------+----------------------------------|
+| =bin/*=                | =~/.local/bin/=                |                                  |
+| =share/fonts/*=        | =~/.local/share/fonts/=        |                                  |
+| =share/applications/*= | =~/.local/share/applications/= | Runs =update-desktop-database=   |
+| =share/icons/*=        | =~/.local/share/icons/=        |                                  |
+| =share/systemd/user/*= | =~/.local/share/systemd/user/= | Auto-enables and starts services |
+
+** The =metadata.yml= File
+
+Defines how =src/= files are symlinked:
+
+#+begin_src yaml
+links:
+  src:
+    .: .config/tmux                    # Link entire src/ to ~/.config/tmux
+    bashrc.d/*: .config/bash/bashrc.d/ # Glob patterns supported
+    config.ini: /etc/myapp/config.ini  # Absolute paths for system files
+
+dirs:
+  ~/.local/share/myapp: 755            # Create directories with permissions
+
+provides:
+  bash-shell:                          # Declare provided capabilities
+
+uses:
+  ssh-client:
+    constraint: required               # Declare dependencies
+#+end_src
+
+* Key Modules
+
+| Module            | Description                                      |
+|-------------------+--------------------------------------------------|
+| =bash=            | Shell configuration with modular initialization  |
+| =tmux=            | Terminal multiplexer configuration               |
+| =emacs=           | Extensive org-mode based Emacs configuration     |
+| =alacritty=       | GPU-accelerated terminal configuration           |
+| =kitty=           | Terminal emulator configuration                  |
+| =ssh-agent=       | SSH key management with live-profile integration |
+| =live-profile=    | Dynamic environment variable injection system    |
+| =lofree-keyboard= | Lofree keyboard fixes (fn-keys, repeat rate)     |
+| =0k-roadwarrior=  | VPN/routing via sing-box                         |
+
+* Advanced Features
+
+** Per-Host Configuration
+
+Several modules support hostname-based variants for machine-specific settings:
+
+- =alacritty/src/host/{hostname}.toml=
+- =bash/src/bashrc.d/host/${HOSTNAME}/=
+
+** Bash Initialization Order
+
+The =bash= module uses numbered scripts in =bashrc.d/= for ordered loading:
+
+| Range   | Purpose                          |
+|---------+----------------------------------|
+| =00-09= | Terminal/early setup             |
+| =10-19= | Environment variables            |
+| =20-29= | Completion, shell options        |
+| =30-39= | Prompt configuration             |
+| =80-89= | Editor settings, aliases         |
+| =90-99= | External tools (nvm, pyenv, fzf) |
+
+Disable a script by adding =.disable= extension.
+
+** Live-Profile System
+
+The =live-profile= module provides dynamic environment injection at command
+execution time via compiled C shims. This enables runtime reconfiguration
+without restarting long-running processes (e.g., Emacs).
+
+Modules integrate by placing scripts in =relations/live-profile/=.
+
+* Thoughts and Notes
+
+Different installation patterns exist:
+
+- System install (e.g., =apt-get install plocate=)
+- Compiled separate versions (=/opt/apps/*=)
+- Dev versions (links from =~/.local/bin= to =~/dev/...=)
+- Versions bundled in cfg-store (e.g., =nvim/app=)
+
+Currently no unified way to list, install, or switch between different versions.
