@@ -48,17 +48,16 @@ live-profile:get () {
             return 1
         }
         env=$(
-            set -o pipefail
             {
-                run 3>&1 1>&2 2>&3 </dev/null |
-                    if [ -n "$LIVE_PROFILE_DEBUG" ]; then
+                if [ -n "$LIVE_PROFILE_DEBUG" ]; then
+                    run 3>&1 1>&2 2>&3 </dev/null |
                         sed -r 's/^/    /g'
-                    else
-                        cat > /dev/null
-                    fi
+                else
+                    { run 3>&1 1>&2 2>&3 ; } </dev/null >/dev/null
+                fi
             } 3>&1 1>&2 2>&3
-           ) || {
-            err "'run' function failed."
+        ) || {
+            err "'run' function failed for '$script'."
             return 1
         }
         [ -n "$env" ] || {
