@@ -1,10 +1,3 @@
-links:
-  ## How to link $CHARM/src/* in your current $HOME/*
-  src:
-    ## All keys start from $CHARM_PATH/src, all values start from $HOME
-    bin/ssh-through-agent: .local/bin/ssh
-    bin/ssh-through-agent: .local/bin/ssh-add
-    bin/ssh-through-agent: .local/bin/git
 uses:
   ssh-client:
     constraint: required
@@ -14,4 +7,3 @@ uses:
     links:
       ## All keys start from ${CHARM_PATH}/relations/{relation_name}, all value start from $HOME
       10-ssh_agent: .ssh/config.d/
-
