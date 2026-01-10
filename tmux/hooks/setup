@@ -1,0 +1,14 @@
+#!/bin/bash
+
+type -p xclip || {
+   echo "xclip is not installed. Please install it first."
+}
+
+
+TMUX_PLUGINS_PATH=~/.local/share/tmux/plugins
+if ! [ -d "$TMUX_PLUGINS_PATH" ]; then
+    mkdir -p "$TMUX_PLUGINS_PATH" && 
+      cd "$TMUX_PLUGINS_PATH" || exit 1
+    git clone https://github.com/tmux-plugins/tpm "$TMUX_PLUGINS_PATH/tpm"
+fi
+

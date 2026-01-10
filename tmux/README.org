@@ -1,0 +1,17 @@
+
+
+* Install
+
+It requires ~~/dev~ to be setup.
+
+#+begin_src sh
+#!/bin/bash
+
+apt-get install -y automake </dev/null
+
+cd ~/dev/c/tmux
+
+## Ubuntu 24.04
+apt-get install -y libevent-2.1-7t64 libevent-core-2.1-7t64
+
+#+end_src
