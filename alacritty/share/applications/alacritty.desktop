@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Name=Alacritty
+Icon=alacritty.png
+Exec=alacritty
+StartupNotify=false
+StartupWMClass=Alacritty
+OnlyShowIn=Unity;Unity7;ubuntu;
+X-Unity-Generated=true

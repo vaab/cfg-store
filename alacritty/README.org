@@ -1,0 +1,23 @@
+# -*- ispell-local-dictionary: "english" -*-
+
+* Install
+
+Requires ~cargo~, from [[https://doc.rust-lang.org/cargo/getting-started/installation.html][here]]
+
+#+begin_src sh
+curl https://sh.rustup.rs -sSf | sh
+
+## XXXvlab: required for `cargo install alacritty` to compile
+## on Ubuntu 24.04
+sudo apt-get install -y pkg-config libfontconfig-dev
+
+#+end_src
+
+#+begin_example
+cargo install alacritty
+#+end_example
+
+* Upgrade
+
+rustup update
+cargo install alacritty --force

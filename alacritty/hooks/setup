@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# mkdir -p ~/.fonts
+#install-link fonts/*.ttf ~/.fonts
+
+echo fc-cache -fv
+
