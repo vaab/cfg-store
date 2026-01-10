@@ -137,7 +137,7 @@ static bool fallback_tmp_cache(char *cache, size_t cache_size, const char *exena
     }
 
     char tmpl[PATH_MAX];
-    int ret = snprintf(tmpl, sizeof(tmpl), "/tmp/live-profile.%s.XXXX.tmp", user);
+    int ret = snprintf(tmpl, sizeof(tmpl), "/tmp/live-profile.%s.XXXXXX", user);
     if (ret < 0 || (size_t)ret >= sizeof(tmpl)) {
         errno = ENAMETOOLONG;
         return false;
@@ -145,6 +145,30 @@ static bool fallback_tmp_cache(char *cache, size_t cache_size, const char *exena
 
     if (!mkdtemp(tmpl))
         return false;
+
+    char tmpdir[PATH_MAX];
+    ret = snprintf(tmpdir, sizeof(tmpdir), "%s.tmp", tmpl);
+    if (ret < 0 || (size_t)ret >= sizeof(tmpdir)) {
+        int saved = errno;
+        rmdir(tmpl);
+        errno = saved ? saved : ENAMETOOLONG;
+        return false;
+    }
+
+    if (rename(tmpl, tmpdir) == -1) {
+        int saved = errno;
+        rmdir(tmpl);
+        errno = saved;
+        return false;
+    }
+
+    ret = snprintf(tmpl, sizeof(tmpl), "%s", tmpdir);
+    if (ret < 0 || (size_t)ret >= sizeof(tmpl)) {
+        int saved = errno;
+        rmdir(tmpdir);
+        errno = saved ? saved : ENAMETOOLONG;
+        return false;
+    }
 
     if (!probe_dir_writable(tmpl))
         return false;
