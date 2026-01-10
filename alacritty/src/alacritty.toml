@@ -32,6 +32,7 @@ background = "#020202"
 [font.normal]
 #family = "RobotoMono"
 family = "Monaco for Powerline"
+#family = "Iosevka"
 #family = "UbuntuSansM Nerd Font"
 #family = "NotoSansM Nerd Font"
 #family = "Cousine Nerd Font"
