@@ -1,0 +1,55 @@
+# -*- ispell-local-dictionary: "english" -*-
+
+#+TITLE: Git - Version Control Configuration
+
+* Overview
+
+This charm manages git configuration including identity, aliases,
+merge policies, and commit signing.
+
+* Structure
+
+#+begin_example
+git/
+├── src/
+│   ├── config    # Main git configuration
+│   ├── ignore    # Global gitignore patterns
+│   └── gitk      # Gitk GUI configuration
+└── metadata.yml
+#+end_example
+
+* Deployment
+
+Files are linked to =~/.config/git/=:
+
+| Source        | Destination            |
+|---------------+------------------------|
+| =src/config=  | =~/.config/git/config= |
+| =src/ignore=  | =~/.config/git/ignore= |
+| =src/gitk=    | =~/.config/git/gitk=   |
+
+* Key Configuration
+
+** Aliases
+
+| Alias | Command          |
+|-------+------------------|
+| =co=  | =checkout=       |
+| =com= | =checkout master= |
+| =st=  | =status=         |
+| =ci=  | =commit=         |
+
+** Merge Policies
+
+- =pull.ff = only= :: Fast-forward only pulls (no merge commits)
+- =rebase.autosquash = true= :: Auto-squash fixup commits
+
+** Commit Signing
+
+Uses SSH-based commit signing. The signing key path is configured
+in the config file.
+
+* Integration
+
+The =ssh-agent= charm provides =git-ssh-keygen= for SSH signing
+integration when both charms are deployed.

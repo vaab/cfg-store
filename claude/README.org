@@ -1,0 +1,43 @@
+# -*- ispell-local-dictionary: "english" -*-
+
+#+TITLE: Claude - AI Assistant Configuration
+
+* Overview
+
+This charm provides global instructions and guidelines for Claude AI
+assistant interactions with codebases. It establishes conventions for
+commits, documentation, and development workflows.
+
+* Structure
+
+#+begin_example
+claude/
+├── src/
+│   ├── CLAUDE.md              # Main guidelines (→ ~/.claude/CLAUDE.md)
+│   └── references/
+│       ├── commit-conventions.md
+│       ├── git-push-convention.md
+│       ├── new-project.md
+│       ├── permission-levels.md
+│       ├── agents-md-convention.md
+│       └── kt-parse.md
+└── metadata.yml
+#+end_example
+
+* Deployment
+
+Files are linked to =~/.claude/=:
+
+| Source           | Destination          |
+|------------------+----------------------|
+| =src/CLAUDE.md=  | =~/.claude/CLAUDE.md= |
+| =src/references/= | =~/.claude/references/= |
+
+* Reference Documents
+
+- =commit-conventions.md= :: Git commit message format and guidelines
+- =git-push-convention.md= :: Remote push workflows and safety checks
+- =new-project.md= :: Guidelines for setting up new projects
+- =permission-levels.md= :: Security permission scoping
+- =agents-md-convention.md= :: Format for project CLAUDE.md files
+- =kt-parse.md= :: Time string parsing utilities

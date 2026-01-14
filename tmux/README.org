@@ -1,17 +1,102 @@
+# -*- ispell-local-dictionary: "english" -*-
 
+#+TITLE: Tmux - Terminal Multiplexer
+
+* Overview
+
+This charm configures the tmux terminal multiplexer with plugin
+management, session persistence, and systemd service integration.
+
+* Structure
+
+#+begin_example
+tmux/
+├── src/
+│   └── tmux.conf            # Main configuration
+├── share/systemd/user/
+│   └── tmux@.service        # Systemd user service template
+├── hooks/
+│   └── setup                # Installs TPM
+└── metadata.yml
+#+end_example
+
+* Deployment
+
+| Source          | Destination              |
+|-----------------+--------------------------|
+| =src/=          | =~/.config/tmux/=        |
+| =share/systemd/user/= | =~/.local/share/systemd/user/= |
+
+* Key Features
+
+** Session Persistence from =tmux=
+
+- Auto-save every 6 minutes
+- Auto-restore on tmux start
+
+** Systemd Integration
+
+The template service =tmux@.service= manages tmux sessions as systemd
+user services. This provides:
+
+- *Auto-start on login* :: Sessions start automatically when you log in,
+  triggering tmux-resurrect to restore your previous session state
+  before you even attach
+- *Persistent sessions* :: Sessions survive terminal closures, and with
+  lingering enabled, also GUI logouts and window manager crashes
+
+Usage:
+
+#+begin_src sh
+## Start a session named "main"
+systemctl --user start tmux@main
+
+## Enable auto-start on login
+systemctl --user enable tmux@main
+
+## Attach to the session
+tmux attach -t main
+#+end_src
+
+The service starts a detached tmux session. You then attach to it from
+any terminal. If you close the terminal, the session continues running
+in the background.
+
+*** Surviving GUI Crashes and Logouts
+
+By default, user services are killed when you log out. To make tmux
+sessions survive window manager crashes, GUI logouts, and relogs,
+enable lingering for your user:
+
+#+begin_src sh
+loginctl enable-linger $USER
+#+end_src
+
+With lingering enabled, your tmux sessions persist independently of
+your login session, surviving desktop environment restarts.
 
 * Install
 
-It requires ~~/dev~ to be setup.
+Requires =~/dev/c/tmux= to be set up for building from source.
 
 #+begin_src sh
-#!/bin/bash
-
-apt-get install -y automake </dev/null
+apt-get install -y automake libevent-dev
 
 cd ~/dev/c/tmux
+./autogen.sh
+./configure
+make
+sudo make install
+#+end_src
 
-## Ubuntu 24.04
+Dependencies for Ubuntu 24.04:
+#+begin_src sh
 apt-get install -y libevent-2.1-7t64 libevent-core-2.1-7t64
+#+end_src
 
+* Dependencies
+
+The setup hook requires =xclip= for clipboard integration:
+#+begin_src sh
+apt-get install -y xclip
 #+end_src

@@ -1,0 +1,79 @@
+# -*- ispell-local-dictionary: "english" -*-
+
+#+TITLE: Bash - Shell Configuration
+
+* Overview
+
+This charm provides a modular bash configuration with numbered
+initialization scripts, per-host customization, and integration
+with various development tools.
+
+* Structure
+
+#+begin_example
+bash/
+├── src/
+│   ├── bashrc               # Main initialization
+│   ├── logout               # Logout script
+│   ├── bashrc.d/            # Modular scripts (00-99)
+│   │   ├── 00-term
+│   │   ├── 05-function
+│   │   ├── 10-env
+│   │   ├── 10-history
+│   │   ├── 15-shopt
+│   │   ├── 20-completion
+│   │   ├── 30-prompt
+│   │   ├── 80-aliases
+│   │   ├── 80-editor
+│   │   └── 90-*             # External tools
+│   ├── lib/                 # Shared libraries
+│   └── host/                # Per-host overrides
+├── hooks/
+│   └── setup
+└── metadata.yml
+#+end_example
+
+* Deployment
+
+| Source            | Destination                     |
+|-------------------+---------------------------------|
+| =src/bashrc=      | =~/.bashrc=                     |
+| =src/logout=      | =~/.bash_logout=                |
+| =src/bashrc.d/*=  | =~/.config/bash/bashrc.d/=      |
+| =src/lib/*=       | =~/.config/bash/lib/=           |
+
+* Initialization Order
+
+Scripts in =bashrc.d/= are loaded by numeric prefix:
+
+| Range   | Purpose                          |
+|---------+----------------------------------|
+| =00-09= | Terminal/early setup             |
+| =10-19= | Environment variables            |
+| =20-29= | Completion, shell options        |
+| =30-39= | Prompt configuration             |
+| =80-89= | Editor settings, aliases         |
+| =90-99= | External tools (nvm, pyenv, fzf) |
+
+* Customization
+
+** Disabling Scripts
+
+Add =.disable= extension to skip a script:
+#+begin_example
+mv 90-nvm 90-nvm.disable
+#+end_example
+
+** Per-Host Overrides
+
+Host-specific scripts go in =bashrc.d/host/$HOSTNAME/=.
+
+* Install
+
+** Ble.sh (Bash Line Editor)
+
+#+begin_src sh
+apt-get install gawk
+cd ~/dev/sh/ble.sh
+make install INSDIR=/opt/apps/ble.sh
+#+end_src

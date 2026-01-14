@@ -1,0 +1,62 @@
+# -*- ispell-local-dictionary: "english" -*-
+
+#+TITLE: SSH-Agent - SSH Key Management
+
+* Overview
+
+This charm manages SSH agent initialization and provides integration
+with other charms via the relations system.
+
+* Structure
+
+#+begin_example
+ssh-agent/
+├── relations/
+│   ├── live-profile/
+│   │   └── ssh-agent.sh     # Environment injection script
+│   ├── ssh-client/
+│   │   └── 00-ssh_agent     # SSH config fragment
+│   └── git/
+│       └── git-ssh-keygen   # Git signing helper
+├── hooks/
+│   └── git-command_relation-joined
+└── metadata.yml
+#+end_example
+
+* Relations
+
+** live-profile
+
+Provides =ssh-agent.sh= which:
+- Detects running ssh-agent processes
+- Creates =~/.ssh/ssh-agent-env= environment file
+- Exports =SSH_AUTH_SOCK= and =SSH_AGENT_PID=
+
+This ensures SSH agent environment is available to wrapped commands
+(ssh, git, scp) even in long-running processes like Emacs.
+
+** ssh-client
+
+Adds to SSH config:
+#+begin_example
+AddKeysToAgent yes
+#+end_example
+
+This automatically adds keys to the agent on first use.
+
+** git
+
+When both =ssh-agent= and =git= charms are deployed, the
+=git-command_relation-joined= hook:
+- Links =git-ssh-keygen= to =~/.local/bin/=
+- Configures git to use SSH signing:
+  =git config --global gpg.ssh.program "git-ssh-keygen"=
+
+* Usage
+
+After deployment, SSH keys are automatically managed:
+
+1. Start ssh-agent (or use existing)
+2. Keys are added on first use (=AddKeysToAgent yes=)
+3. Environment is injected into wrapped commands via live-profile
+4. Git commits can be signed with SSH keys

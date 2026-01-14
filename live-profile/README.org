@@ -1,20 +1,76 @@
 # -*- ispell-local-dictionary: "english" -*-
 
+#+TITLE: Live-Profile - Dynamic Environment Injection
+
+* Overview
+
+This charm provides dynamic environment variable injection at command
+execution time via compiled C shims. This enables runtime
+reconfiguration without restarting long-running processes (e.g.,
+Emacs).
+
+* How It Works
+
+1. C shims wrap common commands (ssh, git, scp, ssh-add, ssh-keygen)
+2. Before executing the real command, shims source plugin scripts
+3. Plugin scripts in =~/.config/live-profile/*.sh= export variables
+4. Variables are injected into the command's environment
+
+This allows changes to SSH agent, proxy settings, or other
+environment to take effect immediately in all contexts.
+
+* Structure
+
+#+begin_example
+live-profile/
+├── bin/
+│   └── live-profile         # Wrapper script
+├── src/bin/
+│   └── live-profile-systemd-env-file
+├── share/live-profile/
+│   └── lib.sh               # Core library
+├── resources/
+│   └── live-profile-shim/
+│       ├── live-profile-shim.c    # C source
+│       ├── Makefile
+│       └── live-profile-shim-*    # Compiled per-host
+└── hooks/
+    └── setup                # Compiles and links shims
+#+end_example
+
+* Deployment
+
+The setup hook:
+1. Installs =live-profile-systemd-env-file= to =/usr/local/bin/=
+2. Compiles C shims for the current hostname
+3. Links shims to =~/.local/bin/= for: ssh, ssh-add, git, scp, ssh-keygen
+
+* Writing Plugins
+
+Create scripts in =~/.config/live-profile/= with a =run()= function:
+
+#+begin_src sh
+# ~/.config/live-profile/my-plugin.sh
+run() {
+    echo "MY_VAR=value"
+}
+#+end_src
+
+The =run()= function should output =VAR=value= pairs, one per line.
+
+* Integration
+
+Other charms integrate via =relations/live-profile/=:
+- =ssh-agent= provides SSH agent environment injection
+- Custom plugins can be added for proxy, credentials, etc.
 
 * Usage
 
-** Live profile
+Once deployed, wrapped commands automatically receive injected
+environment. No manual intervention needed.
 
-=live-profile= is a simple way to ensure some environment variables
-gets added to the call of another binary at call time, ensuring
-evaluation and possibly updated environment.
-
-For instance, this allows to add system features loaded on the fly, as
-ssh-agent, or proxy settings that will be readily available as soon as
-you change them and in long run software (ie: emacs server mode, using
-ssh through git, magit).
-
-Just add in files in ~~/.config/live-profile/*.sh~ and make sure to
-add a link to ~live-profile-run~ with the name of the command you want
-to upgrade in a directory in front of the PATH resolution
-algorithm: this will ensure that it gets called before.
+#+begin_src sh
+## These commands get environment from live-profile plugins
+ssh user@host
+git push origin main
+#+end_src

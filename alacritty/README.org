@@ -1,23 +1,62 @@
 # -*- ispell-local-dictionary: "english" -*-
 
+#+TITLE: Alacritty - GPU-Accelerated Terminal
+
+* Overview
+
+This charm configures the Alacritty terminal emulator with fonts,
+colors, and per-host customization support.
+
+* Structure
+
+#+begin_example
+alacritty/
+├── src/
+│   ├── alacritty.toml       # Main configuration
+│   └── host/                # Per-host overrides
+│       ├── kahn.toml
+│       ├── wen.toml
+│       └── yin.toml
+├── share/
+│   ├── icons/
+│   │   └── alacritty.png
+│   └── applications/
+│       └── alacritty.desktop
+├── hooks/
+│   └── setup                # Refreshes font cache
+└── metadata.yml
+#+end_example
+
+* Deployment
+
+| Source                      | Destination                     |
+|-----------------------------+---------------------------------|
+| =src/alacritty.toml=        | =~/.config/alacritty/=          |
+| =src/host/$HOSTNAME.toml=   | =~/.config/alacritty/local.toml= |
+| =share/icons/=              | =~/.local/share/icons/=         |
+| =share/applications/=       | =~/.local/share/applications/=  |
+
+* Per-Host Configuration
+
+Host-specific settings (font size, window dimensions) are stored in
+=src/host/$HOSTNAME.toml= and linked as =local.toml=.
+
 * Install
 
-Requires ~cargo~, from [[https://doc.rust-lang.org/cargo/getting-started/installation.html][here]]
+Requires =cargo= from [[https://doc.rust-lang.org/cargo/getting-started/installation.html][Rust installation]]:
 
 #+begin_src sh
 curl https://sh.rustup.rs -sSf | sh
 
-## XXXvlab: required for `cargo install alacritty` to compile
-## on Ubuntu 24.04
+## Dependencies for Ubuntu 24.04
 sudo apt-get install -y pkg-config libfontconfig-dev
 
-#+end_src
-
-#+begin_example
 cargo install alacritty
-#+end_example
+#+end_src
 
 * Upgrade
 
+#+begin_src sh
 rustup update
 cargo install alacritty --force
+#+end_src

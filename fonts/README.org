@@ -1,0 +1,30 @@
+# -*- ispell-local-dictionary: "english" -*-
+
+#+TITLE: Fonts - Custom Font Collection
+
+* Overview
+
+This charm manages custom font files, making them available
+system-wide via the XDG fonts directory.
+
+* Included Fonts
+
+- =Monaco-Powerline.ttf= :: Monaco font patched with Powerline glyphs
+- =Monaco-Powerline-V2.otf= :: Updated OpenType version
+- =Sketch_Block.ttf= :: Decorative block-style font
+
+* Deployment
+
+Fonts are linked to =~/.local/share/fonts/common/=.
+
+The setup hook runs =fc-cache -fv= to rebuild the font cache after
+deployment.
+
+* Usage
+
+After deployment, fonts are immediately available to applications.
+Reference them by name in terminal or editor configurations:
+
+#+begin_example
+font_family Monaco for Powerline
+#+end_example

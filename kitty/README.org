@@ -1,0 +1,53 @@
+# -*- ispell-local-dictionary: "english" -*-
+
+#+TITLE: Kitty - Terminal Emulator Configuration
+
+* Overview
+
+This charm configures the Kitty terminal emulator with fonts, colors,
+keybindings, and desktop integration.
+
+* Structure
+
+#+begin_example
+kitty/
+├── src/
+│   └── kitty.conf           # Terminal configuration
+├── share/
+│   ├── icons/               # Application icons
+│   │   ├── kitty.svg
+│   │   └── kitty-framed.svg
+│   └── applications/
+│       └── kitty.desktop    # Desktop entry
+├── hooks/
+│   └── setup                # Links kitty binary
+└── metadata.yml
+#+end_example
+
+* Deployment
+
+| Source            | Destination                |
+|-------------------+----------------------------|
+| =src/kitty.conf=  | =~/.config/kitty/=         |
+| =share/icons/=    | =~/.local/share/icons/=    |
+| =share/applications/= | =~/.local/share/applications/= |
+
+* Key Configuration
+
+- Font: Monaco for Powerline
+- Custom keyboard shortcuts
+- Color scheme configuration
+- Shell integration settings
+
+* Install
+
+The setup hook expects kitty to be compiled from source at
+=~/dev/go/kitty/=. It links the launcher binary to =~/.local/bin/=.
+
+#+begin_src sh
+## Clone and build kitty
+cd ~/dev/go
+git clone https://github.com/kovidgoyal/kitty.git
+cd kitty
+make
+#+end_src
