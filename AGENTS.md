@@ -27,7 +27,7 @@ This is a modular dotfiles/configuration repository managed by `0k-cfg` (from `~
 
 ```bash
 # Deploy/apply configuration modules (requires 0k-cfg installed)
-cfg deploy <module-name>
+cfg setup <module-name>
 
 # List available modules
 ls -d */
@@ -157,34 +157,3 @@ Several modules support hostname-based variants:
 - `~/dev/sh/0k-cfg`: The configuration management tool
 - `~/dev/sh/kal-shlib-common`: Shared shell libraries
 - System packages: ripgrep, plocate
-
-## Commit Conventions
-
-Format: `{type}: [{scope}:] [{module}] {description} [!minor]`
-
-Primary types:
-- `fix:` - Bug fixes
-- `chg:` - Small changes to existing features
-- `new:` - New features or additions
-
-Optional scope (no user-facing impact):
-- `dev:` - Developer-side only (refactor, comments, cosmetics)
-- `doc:` - Documentation only (README.org, etc.)
-- `test:` - Tests only
-- `pkg:` - Project management files (CLAUDE.md, .gitignore, etc.)
-
-Optional suffix:
-- `!minor` - Trivial change, exclude from changelogs
-
-Examples:
-```
-fix: [live-profile] correct ``mkdtemp`` template
-new: [bash] add ``zoxide`` integration
-chg: dev: [emacs] refactor keybinding setup !minor
-chg: pkg: update CLAUDE.md !minor
-```
-
-Guidelines:
-- Use double-backticks around technical terms (paths, variables, function names)
-- No `Co-Authored-By` line
-- Body should explain "why" when not obvious from the title

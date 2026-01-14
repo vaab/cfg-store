@@ -5,10 +5,15 @@
 
 * Overview
 
-This repository contains a modular collection of dotfiles and
-configuration managed by [[https://github.com/0k/0k-cfg][0k-cfg]]. Each directory is a self-contained
-*charm* (module) that manages configuration for a specific tool or
-service.
+This repository contains a *selected subset* of my modular dotfiles
+and configuration, managed by [[https://github.com/0k/0k-cfg][0k-cfg]]. Each directory is a
+self-contained *charm* (module) that manages configuration for a
+specific tool or service.
+
+*Note:* This is not my complete configuration. Only modules suitable
+for public sharing are included here. Some modules have been excluded
+because they contain personal settings, are not clean enough yet, or
+configure tools I no longer actively use.
 
 *This repository is intended to be shared publicly.* It must never
 contain sensitive information such as passwords, API keys, private
@@ -63,7 +68,7 @@ For example:
 #+begin_src sh
 cfg setup tmux          # Deploy tmux configuration
 cfg setup bash          # Deploy bash configuration
-cfg setup emacs         # Deploy emacs configuration
+cfg setup alacritty     # Deploy alacritty configuration
 #+end_src
 
 * Module Structure
@@ -118,17 +123,17 @@ uses:
 
 * Key Modules
 
-| Module            | Description                                      |
-|-------------------+--------------------------------------------------|
-| =bash=            | Shell configuration with modular initialization  |
-| =tmux=            | Terminal multiplexer configuration               |
-| =emacs=           | Extensive org-mode based Emacs configuration     |
-| =alacritty=       | GPU-accelerated terminal configuration           |
-| =kitty=           | Terminal emulator configuration                  |
-| =ssh-agent=       | SSH key management with live-profile integration |
-| =live-profile=    | Dynamic environment variable injection system    |
-| =lofree-keyboard= | Lofree keyboard fixes (fn-keys, repeat rate)     |
-| =0k-roadwarrior=  | VPN/routing via sing-box                         |
+| Module         | Description                                      |
+|----------------+--------------------------------------------------|
+| =bash=         | Shell configuration with modular initialization  |
+| =tmux=         | Terminal multiplexer configuration               |
+| =alacritty=    | GPU-accelerated terminal configuration           |
+| =kitty=        | Terminal emulator configuration                  |
+| =ssh-agent=    | SSH key management with live-profile integration |
+| =live-profile= | Dynamic environment variable injection system    |
+| =git=          | Git configuration                                |
+| =fonts=        | Custom fonts                                     |
+| =claude=       | Claude Code AI assistant configuration           |
 
 * Advanced Features
 
@@ -172,14 +177,14 @@ The =hooks/<other-module>-relation-joined= script is executed when both
 the current module and =<other-module>= are deployed. In these scripts,
 =$PWD= is set to the charm root directory.
 
-Example (from =activity-memo/hooks/kitty-relation-joined=):
+Example:
 
 #+begin_src bash
 #!/bin/bash
 set -eu
 
-TARGET="$HOME/.config/kitty/open-actions.conf"
-SOURCE="$PWD/relations/kitty/open-actions.conf"
+TARGET="$HOME/.config/other-module/config.conf"
+SOURCE="$PWD/relations/other-module/config.conf"
 
 ln -sf "$SOURCE" "$TARGET"
 #+end_src
