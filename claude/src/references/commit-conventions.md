@@ -42,6 +42,18 @@ chg: pkg: update CLAUDE.md !minor
 - Keep commits focused; include rationale and edge cases in the body
 - Reference issues with "Refs #123" or "Fixes #123" when applicable
 
+## Shell escaping
+
+When commit messages contain backticks, use a HEREDOC with single-quoted
+delimiter to prevent bash command substitution:
+
+```bash
+git commit -m "$(cat <<'EOF'
+chg: [module] add ``technical-term`` feature
+EOF
+)"
+```
+
 ## Amending and rebasing
 
 When a small change logically belongs to a recent unpushed commit, prefer
