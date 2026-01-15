@@ -1,0 +1,131 @@
+#!/bin/bash
+# live-profile hook for git
+# Called with: $1=real_git_path, $2...=original args
+
+real_git="$1"
+shift
+
+# Debug logging
+echo "$(date +%H:%M:%S) git $*" >> /tmp/git-hook.log
+
+toplevel=$("$real_git" rev-parse --show-toplevel 2>/dev/null)
+
+# Find the git subcommand (skip options like --no-pager, -c key=val, etc.)
+subcmd=""
+for arg in "$@"; do
+    case "$arg" in
+        --no-pager|--literal-pathspecs|--paginate|--no-replace-objects) continue ;;
+        -c) continue ;;  # next arg is key=val, but we check by pattern below
+        -*) continue ;;
+        *=*) continue ;; # -c key=val
+        *) subcmd="$arg"; break ;;
+    esac
+done
+
+# Only apply special handling in ~/dev repo
+if [[ "$toplevel" == "$HOME/dev" ]]; then
+
+    # "git add" -> use update-index instead (to handle nested repos)
+    # Only intercept simple "git add [--] <files>", pass through if flags like -u/-A/-p
+    if [[ "$subcmd" == "add" ]]; then
+        args=("$@")
+        files=()
+        past_separator=false
+        has_flags=false
+
+        for i in "${!args[@]}"; do
+            arg="${args[$i]}"
+            # Skip everything before "add"
+            if [[ "$arg" == "add" ]]; then
+                # Process remaining args
+                for ((j=i+1; j<${#args[@]}; j++)); do
+                    arg="${args[$j]}"
+                    if [[ "$arg" == "--" ]]; then
+                        past_separator=true
+                    elif [[ "$arg" == -* && "$past_separator" == false ]]; then
+                        # Flag detected (e.g., -u, -A, -p, --all, --update)
+                        has_flags=true
+                        break
+                    else
+                        files+=("$arg")
+                    fi
+                done
+                break
+            fi
+        done
+
+        # Only use update-index if no flags and we have files
+        if [[ "$has_flags" == false && ${#files[@]} -gt 0 ]]; then
+            exec "$real_git" update-index --add "${files[@]}"
+        fi
+        # Fall through to real git for flagged commands
+    fi
+
+    # "git config ... status.showUntrackedFiles" -> lie to magit, say "normal"
+    if [[ "$subcmd" == "config" && "$*" == *"status.showUntrackedFiles"* ]]; then
+        echo "normal"
+        exit 0
+    fi
+
+    # "git status --porcelain" -> filter untracked, inject org files only
+    if [[ "$subcmd" == "status" && "$*" == *"--porcelain"* ]]; then
+        # Check if -z flag is present (null separator)
+        use_null=false
+        [[ "$*" == *"-z"* ]] && use_null=true
+
+        # Run real git status, filter out untracked files (??)
+        if $use_null; then
+            "$real_git" "$@" | tr '\0' '\n' | grep -v '^??' | tr '\n' '\0'
+        else
+            "$real_git" "$@" | grep -v '^??'
+        fi
+
+        # Org-collect cache file
+        cache_file="$HOME/.cache/emacs/org-collect/org-agenda-files.tmp"
+        [[ -f "$cache_file" ]] || exit 0
+
+        # Get list of already tracked files
+        tracked=$("$real_git" ls-files)
+
+        # For each org file in cache under ~/dev, check if untracked
+        while IFS= read -r orgfile; do
+            # Skip if not under ~/dev
+            [[ "$orgfile" == "$HOME/dev/"* ]] || continue
+
+            # Get relative path
+            relpath="${orgfile#$HOME/dev/}"
+
+            # Skip if already tracked by ~/dev repo
+            echo "$tracked" | grep -qxF "$relpath" && continue
+
+            # Skip if file doesn't exist
+            [[ -f "$orgfile" ]] || continue
+
+            # Skip if tracked by its own subrepo
+            subrepo_toplevel=$("$real_git" -C "$(dirname "$orgfile")" rev-parse --show-toplevel 2>/dev/null)
+            if [[ -n "$subrepo_toplevel" && "$subrepo_toplevel" != "$HOME/dev" ]]; then
+                # File is in a subrepo - check if tracked there
+                if "$real_git" -C "$subrepo_toplevel" ls-files --error-unmatch "$orgfile" &>/dev/null; then
+                    continue
+                fi
+            fi
+
+            # Skip if ignored by .gitignore
+            if "$real_git" check-ignore -q "$relpath" 2>/dev/null; then
+                continue
+            fi
+
+            # Output as untracked
+            if $use_null; then
+                printf '?? %s\0' "$relpath"
+            else
+                printf '?? %s\n' "$relpath"
+            fi
+        done < "$cache_file"
+
+        exit 0
+    fi
+fi
+
+# Default: pass through to real git
+exec "$real_git" "$@"

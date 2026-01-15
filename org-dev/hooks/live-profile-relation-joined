@@ -1,0 +1,8 @@
+#!/bin/bash
+set -eu
+
+TARGET="$HOME/.config/live-profile/hooks/git"
+SOURCE="$PWD/relations/live-profile/hooks/git"
+
+mkdir -p "$(dirname "$TARGET")"
+ln -sf "$SOURCE" "$TARGET"

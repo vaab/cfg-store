@@ -1,0 +1,65 @@
+# -*- ispell-local-dictionary: "english" -*-
+
+#+TITLE: Org-Dev - Track Project Org Files from ~/dev
+
+* Overview
+
+This charm enables tracking project management org files (=*.org=)
+from the parent =~/dev= repository, even when these files live inside
+nested git repositories.
+
+* Problem
+
+Each project under =~/dev= has its own git repository. Project
+management org files (notes, tasks, documentation) are kept inside
+each project but intentionally not tracked by the project itself.
+Instead, they should be tracked by the parent =~/dev= repository.
+
+The challenge: git does not descend into nested git repositories when
+looking for untracked files. Running =git status= in =~/dev= will
+never show org files inside =~/dev/foo/= if =foo= is itself a git
+repository.
+
+* Solution
+
+Git is configured to hide untracked files in =~/dev=
+(=status.showUntrackedFiles = no=). A hook then intercepts git
+commands to:
+
+1. Inject org files (from =org-collect= cache) as untracked files
+2. Skip files already tracked by their own nested git repository
+3. Respect =.gitignore= rules
+4. Substitute =git add= with =git update-index= (=git add= refuses to
+   stage files inside nested git repositories, but =update-index= works)
+
+* Magit Compatibility
+
+The hook is designed to work with =magit=:
+
+- =git status --porcelain= is intercepted to inject org files
+- =git config status.showUntrackedFiles= returns "normal" so magit
+  displays the injected files correctly
+- =git add <files>= uses =update-index= for nested repo compatibility
+- =git add -u= and other flagged variants pass through to real git
+
+* Structure
+
+#+begin_example
+org-dev/
+├── README.org
+├── hooks/
+│   └── live-profile-relation-joined
+└── relations/
+    └── live-profile/
+        └── hooks/
+            └── git
+#+end_example
+
+* Dependencies
+
+- =live-profile= charm (provides the shim mechanism)
+- Org file cache at =~/.cache/emacs/org-collect/org-agenda-files.tmp=
+
+* Debug
+
+Hook activity is logged to =/tmp/git-hook.log=.
