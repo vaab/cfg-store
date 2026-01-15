@@ -18,5 +18,5 @@ References below are relative to this file.
 - When writing code, READ `references/coding-guidelines.md`.
 - When creating a CLI executable, READ `references/cli-guidelines.md`.
 - When writing org-mode content, READ `references/org-syntax.md`.
-- Before modifying this file or any global reference, READ `references/global-rules-management.md`.
+- Before creating or modifying this file or any file in `references/`, READ `references/global-rules-management.md`.
 - For debugging Claude Code permission issues, use `ai-audit permissions <session-id>`.
