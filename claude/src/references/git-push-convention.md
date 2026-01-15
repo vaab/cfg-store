@@ -1,34 +1,29 @@
 # Git Push Convention
 
-## Always ask confirmation before pushing
+## When to ask for confirmation
 
-NEVER push to a remote repository without explicit user confirmation, even if
-the user previously asked to "push" in the same conversation.
+Ask for confirmation before pushing UNLESS the user explicitly requested
+the push (e.g., "push the commits", "push to origin").
 
-Before pushing, always ask something like:
-> "Ready to push to origin/master. Proceed?"
+When the user explicitly asks to push, proceed directly.
 
-## Rationale
+When pushing as part of a larger workflow (e.g., after committing), ask first.
 
-Code written or modified with AI assistance should be reviewed before being
-shared with others. Pushing is an irreversible action that affects collaborators
-and CI/CD pipelines.
+## What to show
 
-## What to show before asking
-
-When asking for push confirmation, summarize:
-- Target remote and branch (e.g., `origin/master`)
+Whether asking or proceeding, always summarize:
+- Target remote and branch (e.g., `origin/main`)
 - Number of commits to be pushed
 - Brief description of changes
 
 Example:
-> "Ready to push 3 commits to origin/master:
+> "Pushing 3 commits to origin/main:
 > - Add currency-tx-plot tool
 > - Update README
-> - Fix typo
->
-> Proceed?"
+> - Fix typo"
 
-## Exceptions
+## Rationale
 
-None. Always ask, even for trivial changes.
+Code written or modified with AI assistance should be reviewed before being
+shared with others. However, when the user explicitly requests a push, they
+have already made the decision to share.
