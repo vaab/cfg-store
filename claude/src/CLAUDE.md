@@ -14,7 +14,8 @@ References below are relative to this file.
 - Before writing ANY commit message, READ `references/commit-conventions.md`.
 - Before pushing to a remote, READ `references/git-push-convention.md`.
 - When granting permissions, consider the appropriate level (project/domain/global). READ `references/permission-levels.md`.
-- When asked to create a `CLAUDE.md` for a project, READ `references/agents-md-convention.md`.
+- Before creating or writing any `CLAUDE.md` or `AGENTS.md` file, READ `references/agents-md-convention.md`.
 - When writing code, READ `references/coding-guidelines.md`.
 - When creating a CLI executable, READ `references/cli-guidelines.md`.
 - When writing org-mode content, READ `references/org-syntax.md`.
+- Before modifying this file or any global reference, READ `references/global-rules-management.md`.

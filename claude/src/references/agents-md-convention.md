@@ -1,7 +1,8 @@
 # AGENTS.md Convention
 
-When asked to create a `CLAUDE.md` file for a project (containing project-specific
-instructions, documentation, or context for AI agents), follow this convention:
+When creating any `CLAUDE.md` or `AGENTS.md` file (containing instructions,
+documentation, or context for AI agents), follow this convention. This applies
+to project roots, subdirectories, or any location within a repository.
 
 ## Structure
 
@@ -9,7 +10,6 @@ instructions, documentation, or context for AI agents), follow this convention:
 2. **Create `CLAUDE.md`** as a symlink pointing to `AGENTS.md`
 
 ```bash
-# In project root:
 ln -s AGENTS.md CLAUDE.md
 ```
 
@@ -27,6 +27,16 @@ convention (i.e., it contains project documentation, not Claude-specific config)
 1. Rename `CLAUDE.md` to `AGENTS.md`
 2. Create symlink: `ln -s AGENTS.md CLAUDE.md`
 3. Commit the change with message: `chg: pkg: rename CLAUDE.md to AGENTS.md with symlink`
+
+## Committing
+
+`AGENTS.md` and its `CLAUDE.md` symlink are a logical pair - always commit
+them together:
+
+- When creating: add both files in the same commit
+- When modifying `AGENTS.md`: check if `CLAUDE.md` symlink exists but is
+  untracked, and include it in the same commit
+- When renaming: include both the rename and symlink creation in one commit
 
 ## Exceptions
 

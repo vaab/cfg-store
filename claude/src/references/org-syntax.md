@@ -86,6 +86,29 @@ Drawers are indented 2 spaces under their parent heading:
   :END:
 ```
 
+## Source Citations
+
+When citing URLs as evidence:
+
+- Keep links inline in the claim sentence (avoid bare links on their own line)
+- State what claim the link supports (e.g., "why X happens: [[url][desc]]")
+- Prefer deep links (`#L123`, `#section-anchor`)
+- For GitHub: use permalinks pinned to commit SHA with line range
+  (e.g., `.../blob/<sha>/file.txt#L5-L12`)
+- Place `#+begin_quote` excerpts immediately under the source link
+- Skip quote blocks when permalink+line range is sufficient
+
+```org
+This happens because of X (see [[https://...#L42][source]]).
+
+Or with a quote:
+
+The issue is documented here: [[https://...][source]]
+#+begin_quote
+Relevant excerpt from the source...
+#+end_quote
+```
+
 ## See Also
 
 - For task entries with LOGBOOK/CLOCK time tracking, see `org-task-format.md`.
