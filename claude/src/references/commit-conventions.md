@@ -57,11 +57,28 @@ EOF
 ## Amending and rebasing
 
 When a small change logically belongs to a recent unpushed commit, prefer
-amending or interactive rebasing over creating a separate commit:
+amending or rebasing over creating a separate commit:
 
 - Amend when the change belongs to the most recent commit
-- Use ``git rebase -i`` when the change belongs to an earlier unpushed commit
+- Use ``git commit --fixup`` + ``git rebase --autosquash`` when the change
+  belongs to an earlier unpushed commit
 - Only do this when commits are **not yet pushed** to remote
-- Only do this when the merge/rebase is trivial or easy to resolve
-- Examples of good candidates: fixing a typo in a just-added file, adding
-  forgotten documentation for a new feature, small fix to code just committed
+
+### Decision process
+
+Before committing, evaluate each change:
+
+1. Check ``git log --oneline -5`` and ``git status`` to see recent commits
+2. For each modified file/hunk, ask: "Was this introduced in a recent
+   unpushed commit?"
+3. If yes, the fix belongs to that commit, not a new one
+
+Examples of changes that belong to previous commits:
+- Fixing a wrong value in a just-committed entry
+- Correcting a typo in a just-added file
+- Adding forgotten documentation for a new feature
+
+### Detailed workflows
+
+For line-level staging, fixup commits, and non-interactive rebase, see
+``references/git-history-rewriting.md``.
