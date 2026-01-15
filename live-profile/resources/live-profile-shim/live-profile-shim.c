@@ -221,12 +221,20 @@ static char *find_next_exec(const char *self_path, const char *exename)
         struct stat cand_st;
         if (stat(cand, &cand_st) == -1) continue;
 
-        /* first hit that is *us* → mark, skip */
-        if (
-            cand_st.st_ino == self_st.st_ino && cand_st.st_dev == self_st.st_dev) {
+        /* Check if this is us (symlink to our binary) */
+        if (cand_st.st_ino == self_st.st_ino && cand_st.st_dev == self_st.st_dev) {
+            /* This is our symlink - check for .lp-orig in same directory */
+            char orig[PATH_MAX];
+            snprintf(orig, sizeof(orig), "%s/%s.lp-orig", p, exename);
+            if (access(orig, X_OK) == 0) {
+                free(paths);
+                return strdup(orig);
+            }
+            /* No .lp-orig, continue searching PATH */
             continue;
         }
 
+        /* Found a different executable with same name */
         free(paths);
         return strdup(cand);
     }
@@ -338,7 +346,7 @@ int main(int argc, char **argv, char **envp)
       self[n] = 0;
 
       next_exec = find_next_exec(self, exename);
-      if (!next_exec) die("cannot find next git in PATH");
+      if (!next_exec) die("cannot find .lp-orig or next executable in PATH");
 
       if (write_cache_from_helper(cache, next_exec) == -1)
         die("cache rebuild failed");
@@ -349,6 +357,24 @@ int main(int argc, char **argv, char **envp)
         goto exec;
 
 exec:
+    /* Check for hook script: ~/.config/live-profile/hooks/<exename> */
+    {
+        char hook[PATH_MAX];
+        snprintf(hook, sizeof(hook), "%s/.config/live-profile/hooks/%s", home, exename);
+        if (access(hook, X_OK) == 0) {
+            /* Build new argv: [hook, next_exec, orig_argv[1], orig_argv[2], ...] */
+            char **new_argv = malloc((argc + 2) * sizeof(char *));
+            if (!new_argv) die("malloc failed");
+            new_argv[0] = hook;
+            new_argv[1] = next_exec;
+            for (int i = 1; i < argc; i++)
+                new_argv[i + 1] = argv[i];
+            new_argv[argc + 1] = NULL;
+            execv(hook, new_argv);
+            die("execv hook failed");
+        }
+    }
+
     argv[0] = (char*)next_exec;
     execv(next_exec, argv);
     die("execv next executable");             /* only if exec failed */
