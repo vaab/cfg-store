@@ -23,6 +23,8 @@ Quick reference for org-mode formatting conventions.
 - Always include timezone as fixed UTC offset (`+0200`, `+0100`)
 - Never use named timezones (`CEST`, `CET`, `UTC`)
 - Use local time with explicit timezone
+- **Common mistake:** omitting the timezone (e.g., `[2026-01-17 Sat 08:20]`
+  instead of `[2026-01-17 Sat 08:20 +0100]`)
 
 ## Headings
 
