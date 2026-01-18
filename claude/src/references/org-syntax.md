@@ -88,6 +88,13 @@ Drawers are indented 2 spaces under their parent heading:
   :END:
 ```
 
+**CAPTURED property:** Always use full datetime with timezone:
+```org
+  :PROPERTIES:
+  :CAPTURED: [2025-06-06 Fri 14:30 +0200]
+  :END:
+```
+
 ## Source Citations
 
 When citing URLs as evidence:
