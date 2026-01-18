@@ -20,3 +20,5 @@ References below are relative to this file.
 - When writing org-mode content, READ `references/org-syntax.md`.
 - Before creating or modifying this file or any file in `references/`, READ `references/global-rules-management.md`.
 - For debugging Claude Code permission issues, use `ai-audit permissions <session-id>`.
+- When preparing package for release, READ `references/release-guidelines.md`.
+- When troubleshooting Claude Code crashes or issues, READ `references/claude-troubleshooting.md`.
