@@ -37,6 +37,8 @@ chg: pkg: update CLAUDE.md !minor
 - Keep the first line under 72 characters
 - Use double-backticks around technical terms (paths, variables, function
   names) in both title and body
+- Include the `$` prefix when referencing shell/bash variable names
+  (e.g., ``$SERVICE_DATASTORE``, not ``SERVICE_DATASTORE``)
 - No `Co-Authored-By` line for AI agents
 - Body should explain "why" when not obvious from the title
 - Keep commits focused; include rationale and edge cases in the body
