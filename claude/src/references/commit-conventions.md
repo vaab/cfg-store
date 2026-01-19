@@ -84,3 +84,6 @@ Examples of changes that belong to previous commits:
 
 For line-level staging, fixup commits, and non-interactive rebase, see
 ``references/git-history-rewriting.md``.
+
+For organizing complex uncommitted changes (multiple concerns, fixup
+candidates, rebase planning), use the ``/commit-plan`` skill.
