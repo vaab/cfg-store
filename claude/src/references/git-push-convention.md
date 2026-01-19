@@ -19,6 +19,16 @@ Only push when the user explicitly requests it with words like:
 - "push it"
 - "git push"
 
+## Push authorization is context-specific
+
+Push authorization does NOT carry over across task contexts. Re-confirm before pushing if:
+- The workflow changed (e.g., mistake fix, new task started)
+- Significant time passed since authorization
+- You completed an unrelated task in between
+- The commits to be pushed are different from what was authorized
+
+When in doubt, ask again.
+
 ## What to show before pushing
 
 ## What to show
