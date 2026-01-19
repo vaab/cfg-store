@@ -12,7 +12,7 @@ References below are relative to this file.
 - For parsing time string using command line, use `kt-parse` instead of `date -d`. READ `references/kt-parse.md`.
 - For new projects guidelines, READ `references/new-project.md`.
 - Before writing ANY commit message, READ `references/commit-conventions.md`.
-- Before pushing to a remote, READ `references/git-push-convention.md`.
+- **BLOCKING**: Before ANY `git push` command, you MUST first READ `references/git-push-convention.md` and follow its rules. No exceptions.
 - When granting permissions, consider the appropriate level (project/domain/global). READ `references/permission-levels.md`.
 - Before creating or writing any `CLAUDE.md` or `AGENTS.md` file, READ `references/agents-md-convention.md`.
 - When writing code, READ `references/coding-guidelines.md`.

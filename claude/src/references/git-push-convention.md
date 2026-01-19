@@ -1,13 +1,25 @@
 # Git Push Convention
 
-## When to ask for confirmation
+## NEVER push without explicit request
 
-Ask for confirmation before pushing UNLESS the user explicitly requested
-the push (e.g., "push the commits", "push to origin").
+**NEVER push to any remote unless the user EXPLICITLY asks you to push.**
 
-When the user explicitly asks to push, proceed directly.
+This is a hard rule with NO exceptions. Even if:
+- You just committed changes
+- The workflow seems to imply pushing
+- It would be "convenient"
 
-When pushing as part of a larger workflow (e.g., after committing), ask first.
+**DO NOT PUSH.** Wait for the user to say "push", "push it", "push to remote", etc.
+
+## When to push
+
+Only push when the user explicitly requests it with words like:
+- "push the commits"
+- "push to origin"
+- "push it"
+- "git push"
+
+## What to show before pushing
 
 ## What to show
 
