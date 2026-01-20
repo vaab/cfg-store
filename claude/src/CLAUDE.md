@@ -22,4 +22,5 @@ References below are relative to this file.
 - For debugging Claude Code permission issues, use `ai-audit permissions <session-id>`.
 - **BLOCKING**: Before ANY release-related action (versioning, naming, publishing), you MUST first READ `references/release-guidelines.md` and get explicit user approval for key decisions. No exceptions.
 - When troubleshooting Claude Code crashes or issues, READ `references/claude-troubleshooting.md`.
+- **BLOCKING**: Before modifying `~/.config/opencode/opencode.json`, READ `references/opencode-config.md` and follow the backup/validation procedure. No exceptions.
 - **BLOCKING**: When a mistake is identified (by user or self), IMMEDIATELY invoke the `/learn-from-mistake` skill. Do NOT just acknowledge - run the full workflow. No exceptions.
