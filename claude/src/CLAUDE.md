@@ -19,6 +19,7 @@ References below are relative to this file.
 - **BLOCKING**: Before creating ANY CLI executable, READ `references/cli-guidelines.md`. No exceptions.
 - **BLOCKING**: Before writing ANY org-mode content, READ `references/org-syntax.md`. No exceptions.
 - **BLOCKING**: Before creating or modifying this file or ANY file in `references/`, READ `references/global-rules-management.md`. No exceptions.
+- **BLOCKING**: Before running any project operation (build/test/deploy, device interaction via adb/fastboot), READ the repo's `AGENTS.md` first. Use documented environment (e.g., Java version) and prefer helper scripts over raw commands. No exceptions.
 - For debugging Claude Code permission issues, use `ai-audit permissions <session-id>`.
 - **BLOCKING**: Before ANY release-related action (versioning, naming, publishing), READ `references/release-guidelines.md` and get explicit user approval for key decisions. No exceptions.
 - When troubleshooting Claude Code crashes or issues, READ `references/claude-troubleshooting.md`.
