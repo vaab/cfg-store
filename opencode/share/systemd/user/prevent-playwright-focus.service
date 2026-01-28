@@ -1,0 +1,16 @@
+[Unit]
+Description=Prevent Playwright browser from stealing window focus
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/share/opencode-scripts/prevent-playwright-focus
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+Environment=DISPLAY=:0
+
+[Install]
+WantedBy=default.target

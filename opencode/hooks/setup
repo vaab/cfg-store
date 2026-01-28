@@ -1,0 +1,8 @@
+#!/bin/bash
+set -eu
+
+TARGET="$HOME/.local/share/opencode-scripts"
+SOURCE="$PWD/share/opencode-scripts"
+
+mkdir -p "$(dirname "$TARGET")"
+ln -sfn "$SOURCE" "$TARGET"

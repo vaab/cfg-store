@@ -1,0 +1,54 @@
+#!/bin/bash
+# Prevent Playwright browser from stealing window focus
+#
+# This script watches for active window changes and immediately refocuses
+# to the previous window when a Playwright-launched Chromium steals focus.
+#
+# Requirements: wmctrl, xprop (usually pre-installed on GNOME)
+
+set -euo pipefail
+
+PREV_WINDOW=""
+CURRENT_WINDOW=""
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
+}
+
+log "Starting Playwright focus prevention daemon"
+
+# Check dependencies
+for cmd in xprop wmctrl; do
+    if ! command -v "$cmd" &>/dev/null; then
+        log "ERROR: Required command '$cmd' not found. Install with: sudo apt install $cmd"
+        exit 1
+    fi
+done
+
+# Watch for active window changes (event-driven via xprop -spy)
+xprop -spy -root -notype _NET_ACTIVE_WINDOW 2>/dev/null | \
+    stdbuf -oL sed 's/^.*# //' | \
+    stdbuf -oL grep -vF 0x0 | \
+while read -r WINDOW_ID; do
+    # Skip invalid window IDs
+    [[ -z "$WINDOW_ID" || "$WINDOW_ID" == "0x0" ]] && continue
+
+    # Get full WM_CLASS (contains both instance and class)
+    WM_CLASS_FULL=$(xprop -id "$WINDOW_ID" WM_CLASS 2>/dev/null || echo "")
+
+    # Check if WM_CLASS instance (first field) contains playwright indicators
+    # Example: WM_CLASS(STRING) = "google-chrome (/home/vaab/.cache/ms-playwright/mcp-chrome)", "Google-chrome"
+    if [[ "$WM_CLASS_FULL" =~ "ms-playwright" || "$WM_CLASS_FULL" =~ "mcp-chrome" || "$WM_CLASS_FULL" =~ "mcp-chromium" ]]; then
+        log "Playwright browser detected - refocusing to previous window"
+
+        # Refocus previous window
+        if [[ -n "$PREV_WINDOW" && "$PREV_WINDOW" != "0x0" ]]; then
+            wmctrl -i -a "$PREV_WINDOW" 2>/dev/null || true
+        fi
+        continue
+    fi
+
+    # Update previous window (only for non-Playwright windows)
+    PREV_WINDOW="$CURRENT_WINDOW"
+    CURRENT_WINDOW="$WINDOW_ID"
+done
