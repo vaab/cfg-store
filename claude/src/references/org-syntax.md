@@ -7,14 +7,12 @@ Quick reference for org-mode formatting conventions.
 **Active timestamps** (appear in agenda):
 ```
 <2025-06-06 Fri>              # date only
-<2025-06-06 Fri 14:30>        # date + time
 <2025-06-06 Fri 14:30 +0200>  # date + time + timezone
 ```
 
 **Inactive timestamps** (don't appear in agenda):
 ```
 [2025-06-06 Fri]              # date only
-[2025-06-06 Fri 14:30]        # date + time
 [2025-06-06 Fri 14:30 +0200]  # date + time + timezone
 ```
 
