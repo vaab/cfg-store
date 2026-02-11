@@ -44,6 +44,27 @@ chg: pkg: update CLAUDE.md !minor
 - Keep commits focused; include rationale and edge cases in the body
 - Reference issues with "Refs #123" or "Fixes #123" when applicable
 
+## Preflight Checklist (BLOCKING)
+
+Before running `git commit`, perform this backtick audit:
+
+1. Scan commit message (title AND body) for technical terms:
+   - Filenames: `README.org`, `Cargo.toml`, `package.json`
+   - Paths: `src/lib.rs`, `bin/test`, `~/.config/`
+   - Commands/tools: `cargo`, `git`, `docshtest`
+   - Flags: `-F`, `--format`
+   - Variables: `$HOME`, `$PATH`
+   - Function/type names: `parse_time`, `DateTime`
+
+2. Verify each technical term is wrapped in double-backticks
+
+3. Do NOT proceed to commit until audit passes
+
+**Bad → Good examples:**
+- `add tests for README.org` → `add tests for ``README.org```
+- `run docshtest on examples` → `run ``docshtest`` on examples`
+- `fix $HOME path handling` → `fix ``$HOME`` path handling`
+
 ## Shell escaping
 
 When commit messages contain backticks, use a HEREDOC with single-quoted
