@@ -16,6 +16,7 @@ References below are relative to this file.
 - **BLOCKING**: Before granting ANY permissions, READ `references/permission-levels.md` and consider the appropriate level (project/domain/global). No exceptions.
 - **BLOCKING**: Before creating or writing ANY `CLAUDE.md` or `AGENTS.md` file, READ `references/agents-md-convention.md`. No exceptions.
 - **BLOCKING**: Before writing ANY code, READ `references/coding-guidelines.md`. No exceptions.
+- **BLOCKING**: After implementing ANY feature, fix, or change, you MUST verify it works BY YOURSELF. NEVER ask the user to test, check, or verify your work. READ `references/self-verification.md` and write automated tests. No exceptions.
 - **BLOCKING**: Before creating ANY CLI executable, READ `references/cli-guidelines.md`. No exceptions.
 - **BLOCKING**: Before structuring a Rust CLI project's `src/` directory, READ `references/rust-cli-structure.md`. No exceptions.
 - **BLOCKING**: Before writing ANY org-mode content, READ `references/org-syntax.md`. No exceptions.
