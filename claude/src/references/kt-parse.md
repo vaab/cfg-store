@@ -5,44 +5,55 @@ scripts instead of `date -d` for more flexible time parsing.
 
 ## Usage
 
-`kt-parse time <time-string>`
-`kt-parse timespan <time-string-start>[..<time-string-end>]`
+`kt-parse [-F <format>] time <time-string>`
+`kt-parse [-F <format>] timespan <time-string-start>[..<time-string-end>]`
 
-Output line:
+### Output Formats (-F flag)
 
-`<unix_timestamp> <YYYY-MM-DD> <HH:MM:SS> <+TZ>`
+- `full` (default): `<unix_timestamp> <YYYY-MM-DD> <HH:MM:SS> <+TZ>`
+- `ts`: Unix timestamp only (e.g., `1736160300`)
+- `iso`: ISO 8601 format (e.g., `2025-01-06T11:45:00+01:00`)
 
-- 1 line for `time`,
-- 2 lines for start and end in case of `timespan` requested.
+Output lines: 1 for `time`, 2 for `timespan` (start and end).
 
-Examples:
+## Examples
 
 ```bash
-# Parse english words to timestamp and formatted full date time and tz
+# Default full output
+kt-parse time "2026-01-12 02:54"
+# Output: 1768182840 2026-01-12 02:54:00 +01:00
+
+# Timestamp only
+kt-parse -F ts time "2026-01-12 02:54"
+# Output: 1768182840
+
+# ISO 8601 format
+kt-parse -F iso time "2026-01-12 02:54"
+# Output: 2026-01-12T02:54:00+01:00
+
+# Timespan with timestamp output
+kt-parse -F ts timespan "2026-01-12 10:00..11:00"
+# Output:
+# 1768209600
+# 1768213200
+
+# Natural language
 kt-parse time now
-kt-parse time "1 week ago"
+kt-parse -F ts time "1 week ago"
 
-kt-parse time "2026-01-12 02:54"         ## no offset specified => TZ env var used
-kt-parse time "2026-01-12 02:54+01:00"   ## offset specified so it is used
-# Output (TZ=Europe/Paris): 1768182840 2026-01-12 02:54:00 +01:00
+# Explicit offset overrides TZ
+kt-parse time "2026-01-12 02:54+01:00"
 
-# Parse incomplete spec to timestamp and formatted full date time and tz
-kt-parse time 2026-01-01                 ## defaults left side missing info to minimum
+# Incomplete spec defaults missing left-side info to minimum
+kt-parse time 2026-01-01
 # Output (TZ=Europe/Paris): 1767222000 2026-01-01 00:00:00 +01:00
 
-# Parse a timespan (returns start and end timestamps relative to now)
-kt-parse timespan "2026-01-12 02:54..2026-01-13 03:00"  # partial (no seconds)
-kt-parse timespan "2026-01-12..2026-01-15"              # partial (no time)
-kt-parse timespan "2026-01-12 02:54..03:00"             # partial (year/month/day infered)
-kt-parse timespan "2026-01-12 02:54..03:00"             # partial (year/month/day infered)
-# Output: two lines with start/end timestamps
-
-# Extract just the unix timestamp
-kt-parse time "2026-01-12 02:54" | awk '{print $1}'
+# Timespan with partial end time (infers year/month/day from start)
+kt-parse timespan "2026-01-12 02:54..03:00"
 ```
 
 ## Notes
 
-- Support english words "now", "today", ...
+- Supports english words "now", "today", "yesterday", "1 week ago", etc.
 - For fallback when `kt-parse` unavailable, use `date -d "$time" +%s`
 - Project code in `~/dev/rs/kal-time`, full doc in `~/dev/rs/kal-time/README.org`
