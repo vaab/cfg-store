@@ -22,8 +22,8 @@ Default output should balance human readability and parseability.
 
 Implement in order of priority:
 
-1. **Human-readable (mandatory)**: Default. Clear, concise. May use summaries.
-2. **NUL-separated `-0` (recommended)**: Fixed-field records for GNU tools piping (`xargs -0`, `while read -d ''`). May include more data than human output.
+1. **Human-readable (mandatory)**: Default. Clear, concise. May use summaries. Keep it reasonably computer parseable.
+2. **NUL-separated `-0` (recommended)**: Fixed-number of field's records for GNU tools piping (`xargs -0`, `while read -d ''`). May include more data than human output.
 3. **NDJSON `--json`/`-j` (optional)**: One JSON object per line. Field order: timestamp (if any) → fixed-width common → other common → optional/record-specific.
 
 ### Timestamps
@@ -56,4 +56,4 @@ Implement in order of priority:
 ## Configuration
 
 - Use standard locations (`~/.config/<appname>/`).
-- Support env vars for common options (document in `--help`).
+- Support env vars for common options (document in `--help`), prefixed by exname in all caps: ie: `<EXNAME>_MY_ENV_VAR`.
