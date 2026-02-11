@@ -21,10 +21,12 @@ References below are relative to this file.
 - **BLOCKING**: Before writing ANY org-mode content, READ `references/org-syntax.md`. No exceptions.
 - **BLOCKING**: Before creating or modifying this file or ANY file in `references/`, READ `references/global-rules-management.md`. No exceptions.
 - **BLOCKING**: Before running any project operation (build/test/deploy, device interaction via adb/fastboot), READ the repo's `AGENTS.md` first. Use documented environment (e.g., Java version) and prefer helper scripts over raw commands. No exceptions.
+- **BLOCKING**: Before committing ANY code that interacts with external systems (hardware, APIs, filesystem, CLI), READ `references/integration-testing-protocol.md` and verify with REAL dependencies. Unit tests alone are insufficient. No exceptions.
 - For debugging Claude Code permission issues, use `ai-audit permissions <session-id>`.
 - **BLOCKING**: Before ANY release-related action (versioning, naming, publishing), READ `references/release-guidelines.md` and get explicit user approval for key decisions. No exceptions.
 - When troubleshooting Claude Code crashes or issues, READ `references/claude-troubleshooting.md`.
 - **BLOCKING**: Before modifying `~/.config/opencode/opencode.json`, READ `references/opencode-config.md` and follow the backup/validation procedure. No exceptions.
+- **BLOCKING**: Before upgrading ANY globally installed software or tool, READ `references/software-upgrades.md`. No exceptions.
 - **BLOCKING**: When a mistake is identified (by user or self), IMMEDIATELY invoke the `/learn-from-mistake` skill. Do NOT just acknowledge - run the full workflow. No exceptions.
   - **Hard triggers** (invoke skill immediately, NO clarifying questions first): "you made a mistake", "that's wrong", "you violated X", "you ignored instructions", "mistake again"
   - When these phrases appear, your FIRST action must be to invoke the skill - do not ask "what did I do wrong?"
