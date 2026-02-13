@@ -1,53 +1,95 @@
 # Desktop App Orchestration
 
-How to interact with GUI desktop applications from the terminal. Use
-`xdotool` for window management and input simulation, `wmctrl` for
-window discovery, and `gnome-screenshot` + PIL for visual feedback.
+How to interact with GUI desktop applications from the terminal.
+
+## Tools
+
+- `winxy` — coordinate conversion + screenshot + click (see below)
+- `xdotool` — window management and input simulation
+- `wmctrl` — window discovery
+- `xwd` — screenshot by window ID (no focus required)
 
 ## General Workflow
 
 1. **Launch** the app (with any required flags)
-2. **Find** its window via `wmctrl -l` or `xdotool search`
-3. **Activate** the window with `wmctrl -i -a <wid>`
-4. **Interact** via `xdotool key`/`xdotool type`
-5. **Capture** with `gnome-screenshot -f` + PIL crop to window bounds
-6. **Read** the screenshot with `look_at` vision tool
+2. **Find** its window via `winxy` or `xdotool search`
+3. **Screenshot** by window ID: `winxy --screenshot /tmp/app.png "AppName"`
+4. **Analyze** with `look_at` vision tool (get % coordinates)
+5. **Click** at position: `winxy --click "AppName" <x_pct> <y_pct>`
+6. **Interact** via `xdotool key`/`xdotool type`
 
 ### Window Discovery
 
 ```bash
-# List all windows with geometry
-wmctrl -l -G
+# Find visible window by title pattern (filters tiny helper windows)
+winxy --screenshot /tmp/app.png "AppName"
 
-# Find by title
-wmctrl -l | grep -i "AppName"
-
-# Get window geometry
-xdotool getwindowgeometry <wid>
+# Or manually:
+wmctrl -l -G | grep -i "AppName"
+xdotool search --onlyvisible --name "AppName"
 ```
 
-### Screenshot on Multi-Monitor
+### Screenshot (by window ID — focus independent)
 
-The user has a multi-monitor setup (11520×4320 total). Full
-screenshots are too large for vision. Always crop to the target
-window:
+**Always use `winxy --screenshot`** or `xwd -id` to capture by
+window ID.  Never use `gnome-screenshot -w` — it captures whichever
+window has focus, which is unreliable during automation.
 
-```python
-from PIL import Image
-import subprocess
+```bash
+# Preferred: captures by window ID, auto-resizes for vision
+winxy --screenshot /tmp/app.png "AppName"
 
-img = Image.open("/tmp/screenshot.png")
-# Parse wmctrl -l -G for x, y, w, h
-crop = img.crop((x, y, x + w, y + h))
-# Resize if needed (keep under ~1920×1080 for vision)
-ratio = min(1920 / w, 1080 / h, 1.0)
-crop.resize((int(w * ratio), int(h * ratio))).save("/tmp/app_view.png")
+# Manual equivalent (requires ImageMagick):
+WID=$(xdotool search --onlyvisible --name "AppName" | head -1)
+xwd -id "$WID" -silent | convert xwd:- -resize 1920x1920\> /tmp/app.png
 ```
+
+### Clicking (winxy)
+
+`winxy` converts screenshot-relative percentage coordinates to
+absolute screen coordinates, accounting for HiDPI scaling.
+
+```bash
+# Dry-run: print absolute coordinates
+winxy "AppName" 50 30
+
+# Click at 50% x, 30% y of the window
+winxy --click "AppName" 50 30
+
+# Verbose: show coordinate math
+winxy --click -v "AppName" 50 30
+```
+
+### Coordinate Model (X11 + GNOME HiDPI)
+
+`xdotool getwindowgeometry --shell` returns:
+- **X, Y** in logical (scaled) coordinates — same space as `mousemove`
+- **WIDTH, HEIGHT** in compositor pixels (unscaled)
+
+`xwd -id` captures in compositor pixels too, but may differ from
+xdotool's WIDTH/HEIGHT by a small border (e.g., 40px for Firefox).
+`winxy` probes the actual `xwd` dimensions and uses those as the
+percentage base, since they match what vision sees in the screenshot.
+
+Scale factor (from `gsettings scaling-factor`) converts pixel offsets
+to logical offsets:
+
+```
+click = origin_XY + round(pct/100 * xwd_dimension / scale)
+```
+
+`winxy` handles this automatically.  Override scale with
+`WINXY_SCALE=<int>` if auto-detection fails.
+
+**Note**: for maximized windows whose frame extends behind the GNOME
+panel, `xwd` captures content including the hidden portion.  The
+percentages from vision still map correctly — the formula accounts
+for the full screenshot dimensions.
 
 ### Input Simulation
 
 ```bash
-# Activate window first
+# Activate window first (winxy --click does this automatically)
 wmctrl -i -a <wid>
 sleep 0.5
 
@@ -60,6 +102,77 @@ xdotool type --delay 30 "search query"
 
 # Press Enter
 xdotool key Return
+```
+
+### winxy Location
+
+Project: `~/dev/python/winxy/winxy`
+Symlink: `~/.local/bin/winxy`
+
+## Firefox
+
+### Launch / Binary
+
+Firefox is installed via snap (`/snap/firefox/*/usr/lib/firefox/firefox`).
+The CLI wrapper is at `/usr/bin/firefox`.
+
+### Open a URL (new tab in running instance)
+
+```bash
+firefox https://example.com &>/dev/null & disown
+```
+
+If Firefox is already running, this opens the URL in a new tab in
+the existing window. No special flags needed.
+
+### Window Identification
+
+Firefox registers with `wmctrl` with a title ending in
+`— Mozilla Firefox`:
+
+```bash
+wmctrl -l | grep -i firefox
+```
+
+### Tab Navigation
+
+```bash
+WID=$(wmctrl -l | grep -i firefox | awk '{print $1}')
+wmctrl -i -a "$WID"
+sleep 0.5
+
+# Next / previous tab
+xdotool key ctrl+Tab
+xdotool key ctrl+shift+Tab
+
+# Go to tab by position (1-8, 9 = last)
+xdotool key ctrl+1
+
+# New empty tab
+xdotool key ctrl+t
+
+# Close current tab
+xdotool key ctrl+w
+
+# Address bar (type a URL or search)
+xdotool key ctrl+l
+sleep 0.3
+xdotool type --delay 30 "https://example.com"
+xdotool key Return
+```
+
+### Typical Workflow
+
+```bash
+# 1. Open URL (launches or reuses running instance)
+firefox https://chatgpt.com &>/dev/null & disown
+sleep 3
+
+# 2. Screenshot by window ID (no focus needed)
+winxy --screenshot /tmp/firefox.png Firefox
+
+# 3. Analyze with look_at, then click
+winxy --click Firefox 6 46
 ```
 
 ## Signal Desktop
@@ -108,15 +221,9 @@ wmctrl -l -G | grep "Signal"
 # 2. Wait for window
 for i in $(seq 1 15); do
   sleep 1
-  WID=$(wmctrl -l | grep "Signal" | awk '{print $1}')
-  [ -n "$WID" ] && break
+  winxy --screenshot /tmp/signal.png Signal 2>/dev/null && break
 done
 
-# 3. Activate and screenshot
-wmctrl -i -a "$WID"
-sleep 1
-gnome-screenshot -f /tmp/signal.png
-
-# 4. Crop to Signal window (parse wmctrl -l -G for coordinates)
-# 5. Analyze with look_at tool
+# 3. Analyze with look_at, then click on a chat
+winxy --click Signal 50 30
 ```
