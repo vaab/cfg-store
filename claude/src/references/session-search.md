@@ -22,7 +22,7 @@ ai-audit list-sessions -p /home/vaab/dev/rs/ai-audit
 # Combine filters
 ai-audit list-sessions --timespan "2026-02-11" --search "some keyword"
 ai-audit list-sessions --search "some keyword" -t claudecode
-ai-audit list-sessions -p ai-audit --timespan today
+ai-audit list-sessions -p . --timespan today
 
 # Machine-readable output
 ai-audit list-sessions --search "some keyword" --json
@@ -31,7 +31,8 @@ ai-audit list-sessions --search "some keyword" --json
 ### ``--search``
 
 - **Case-sensitive** (exact substring match).
-- Searches both user and assistant message content.
+- Searches all transcript content: user/assistant text messages,
+  tool_use names and inputs, and tool_result output.
 - Scans Claude Code ``.jsonl`` session files and OpenCode part files.
 
 ### ``--timespan``
@@ -39,11 +40,11 @@ ai-audit list-sessions --search "some keyword" --json
 - Uses ``kal-time`` for parsing (same syntax as ``kt-parse timespan``).
 - Accepts explicit dates (``2026-02-11``), ranges (``2026-02-01..05``),
   and natural language (``yesterday``, ``1 week ago``).
+- A session is included if its activity range (started to last updated)
+  **overlaps** with the timespan — not just if it started within it.
 - **Caveat**: ``today`` resolves to "now to now+1day" (chrono-english
   behavior), not midnight-to-midnight. Use an explicit date
   (e.g., ``2026-02-11``) for full-day ranges.
-- Timespan filter runs before ``--search``, cheaply pruning sessions
-  before the more expensive content scan.
 
 ### ``--project``
 
