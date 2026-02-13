@@ -14,9 +14,10 @@ ai-audit list-sessions --timespan "2026-02-11"
 ai-audit list-sessions --timespan "2026-02-01..2026-02-11"
 ai-audit list-sessions --timespan yesterday
 
-# Filter by project directory (substring match)
-ai-audit list-sessions --project "ai-audit"
-ai-audit list-sessions -p rs/fyl
+# Filter by project directory (exact path match, can be relative)
+ai-audit list-sessions --project .
+ai-audit list-sessions -p ../fyl
+ai-audit list-sessions -p /home/vaab/dev/rs/ai-audit
 
 # Combine filters
 ai-audit list-sessions --timespan "2026-02-11" --search "some keyword"
@@ -46,8 +47,10 @@ ai-audit list-sessions --search "some keyword" --json
 
 ### ``--project``
 
-- Substring match against the project directory path.
-- Example: ``-p ai-audit`` matches ``/home/vaab/dev/rs/ai-audit``.
+- Exact match against the session's project directory.
+- The value is interpreted as a filesystem path (absolute or relative)
+  and resolved to an absolute path via ``canonicalize``.
+- Examples: ``-p .`` (current dir), ``-p ../fyl``, ``-p /absolute/path``.
 - The ``project_dir`` field appears in all output formats (human, JSON,
   NUL).
 
