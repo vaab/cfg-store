@@ -109,6 +109,26 @@ command errors with a list of candidates and asks for ``--session``.
 Works with both Claude Code (``.jsonl``) and OpenCode
 (``storage/message/`` + ``storage/part/``) session formats.
 
+## Current Session Detection
+
+Detect and print the current AI session ID (when called from inside
+a session).
+
+```sh
+# Plain session ID (for scripting)
+ai-audit current-session
+
+# JSON with provider info
+ai-audit current-session --json
+
+# NUL-terminated (for piping)
+ai-audit current-session -0
+```
+
+Uses the same auto-detection logic as ``transcript`` (env vars,
+process tree, transcript fingerprinting). Useful as a building block
+for scripts and other tools.
+
 ## Filtering Activity by Session
 
 Activity events are **user-side only**: user messages and permission
