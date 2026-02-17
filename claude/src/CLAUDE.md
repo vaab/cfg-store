@@ -34,6 +34,7 @@ References below are relative to this file.
 - Before interacting with ANY desktop GUI application (launching, automating, screenshotting), READ `references/desktop-app-orchestration.md`. Covers Signal Desktop and general xdotool/wmctrl workflow.
 - **BLOCKING**: Before working on ANY remote server via SSH, READ `references/remote-ssh-workflow.md`. All remote work must happen in a visible tmux pane. No exceptions.
 - **BLOCKING**: Before creating, splitting, killing, or resizing ANY tmux pane, window, or session, READ `references/tmux-pane-safety.md`. Verify before destroying. No exceptions.
+- Before inspecting or reasoning about tmux pane layouts, READ `references/tmux-layout-awareness.md`. Use `ai-tmux layout -c` to see the user's window.
 - **BLOCKING**: When a mistake is identified (by user or self), IMMEDIATELY invoke the `/learn-from-mistake` skill. Do NOT just acknowledge - run the full workflow. No exceptions.
   - **Hard triggers** (invoke skill immediately, NO clarifying questions first): "you made a mistake", "that's wrong", "you violated X", "you ignored instructions", "mistake again"
   - When these phrases appear, your FIRST action must be to invoke the skill - do not ask "what did I do wrong?"
