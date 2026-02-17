@@ -46,6 +46,23 @@ ai-tmux layout -t mysession:2
 - Use the pane IDs from the output to target specific panes.
 - The active pane (where the user's cursor is) is prefixed with `*`.
 
+## Resolving Spatial References
+
+When the user refers to a pane by position — "the pane on the left",
+"the one above", "top right", "just below" — you MUST run
+`ai-tmux layout -c` first to map the spatial description to an actual
+pane ID.
+
+**Never guess a pane ID from memory or context.** The layout may have
+changed since you last looked.
+
+Example workflow:
+
+1. User says: "send that command to the pane on the right"
+2. Run `ai-tmux layout -c` → see the layout
+3. Identify which pane is to the right of the active pane
+4. Use that pane's ID for the `tmux send-keys` command
+
 ## See Also
 
 - `tmux-pane-safety.md` — rules for modifying tmux panes safely
