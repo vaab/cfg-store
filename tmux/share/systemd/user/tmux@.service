@@ -5,6 +5,7 @@ After=default.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
+OOMScoreAdjust=-900
 Environment=PATH=%h/.local/bin:/opt/merge/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ExecStart=/usr/bin/env bash -lc 'tmux start-server; tmux has-session -t %i 2>/dev/null || tmux new-session -d -s %i'
 ExecStop=/usr/bin/env tmux kill-session -t %i

@@ -1,0 +1,8 @@
+# -*- mode: shell-script -*-
+
+## Reset OOM score inside tmux panes to the user-session default.
+## The tmux server runs with OOMScoreAdjust=-900 to protect it from
+## the OOM killer, but children inherit that value.  This restores
+## normal OOM priority so runaway processes in panes get killed
+## instead of tmux itself.
+[[ -n "$TMUX" ]] && echo 200 > /proc/self/oom_score_adj 2>/dev/null
