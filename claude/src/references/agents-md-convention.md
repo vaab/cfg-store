@@ -38,8 +38,31 @@ them together:
   untracked, and include it in the same commit
 - When renaming: include both the rename and symlink creation in one commit
 
+## Local instruction files (`.local.md`)
+
+`CLAUDE.local.md` is a non-versioned, per-machine override file (typically
+gitignored).  Unlike `AGENTS.md`/`CLAUDE.md`, **there is no `AGENTS.local.md`
+convention** — no tool reads it natively.
+
+- **Claude Code**: reads `CLAUDE.local.md` automatically.
+- **OpenCode**: does **not** read `.local.md` files automatically.  You must
+  add it to the `instructions` array in `opencode.json`:
+
+```json
+{
+  "instructions": ["CLAUDE.local.md"]
+}
+```
+
+When creating a `CLAUDE.local.md` in a project, always check that
+`opencode.json` includes the entry above so both tools read it.
+
+The AGENTS.md/CLAUDE.md symlink convention does **not** apply to `.local.md`
+files — just create `CLAUDE.local.md` directly as a regular file.
+
 ## Exceptions
 
 This convention applies to project documentation files. It does NOT apply to:
 - `~/.claude/CLAUDE.md` (global user config)
 - `.claude/` directory contents (Claude Code internal config)
+- `CLAUDE.local.md` (local override — see above)

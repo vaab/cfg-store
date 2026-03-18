@@ -34,6 +34,10 @@ chg: pkg: update CLAUDE.md !minor
 
 ## Guidelines
 
+- Write the description in imperative mood so it completes the sentence
+  "If this commit is applied, it will {description}." For example:
+  "correct ``mkdtemp`` template" ✓ (it will correct...),
+  "no longer fails on X" ✗ (it will no longer fails...)
 - Keep the first line under 72 characters
 - Use double-backticks around technical terms (paths, variables, function
   names) in both title and body
@@ -43,6 +47,11 @@ chg: pkg: update CLAUDE.md !minor
 - Body should explain "why" when not obvious from the title
 - Keep commits focused; include rationale and edge cases in the body
 - Reference issues with "Refs #123" or "Fixes #123" when applicable
+
+## Excluded Files
+
+Never commit ``doc/admin.org`` files — these are personal notes, not
+for version control.
 
 ## Preflight Checklist (BLOCKING)
 

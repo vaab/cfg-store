@@ -3,6 +3,32 @@
 Use ``ai-audit`` to find, filter, and inspect AI assistant sessions
 (Claude Code and OpenCode).
 
+## Quick Self-Identification
+
+Run ``oc whoami`` for a one-shot summary of the current session
+context. All fields are conditional — sections are omitted when the
+corresponding context is unavailable (no tmux, not inside an opencode
+session, ``ai-audit`` not installed, etc.).
+
+```sh
+oc whoami
+```
+
+Example output:
+
+```
+Server:      http://127.0.0.1:4096 (PID 631437)
+Client PID:  892267 (376 MB)
+Project:     ~/.cfg-store/live-shared/opencode
+Tmux pane:   %93 (ai-tmux:opencode.2)
+Session:     ses_396d671a8ffePePYs28QiNwSje
+Connections: 4
+```
+
+Use this when you need to know your own session ID, tmux pane, project
+directory, or client PID. For searching *other* sessions or past
+conversations, use the ``ai-audit`` commands below.
+
 ## Listing Sessions
 
 ```sh
@@ -115,11 +141,11 @@ Works with both Claude Code (``.jsonl``) and OpenCode
 
 ## Current Session Detection
 
-Detect and print the current AI session ID (when called from inside
-a session).
+Detect and print the current AI session ID. Supports three detection
+strategies.
 
 ```sh
-# Plain session ID (for scripting)
+# Auto-detect (env vars, process tree, fingerprinting)
 ai-audit current-session
 
 # JSON with provider info
@@ -128,6 +154,55 @@ ai-audit current-session --json
 # NUL-terminated (for piping)
 ai-audit current-session -0
 ```
+
+### ``--match`` (text-based identification)
+
+Find a session by matching text in its last N messages. Useful after
+a crash + tmux-resurrect to identify which session was running in a
+pane from visible text.
+
+```sh
+# Search for text in last 5 messages (default)
+ai-audit current-session --match "visible text from pane"
+
+# Limit to OpenCode sessions, search last 3 messages
+ai-audit current-session --match "text" -t opencode -n 3
+
+# Restrict to a specific project directory
+ai-audit current-session --match "text" -p /home/vaab/dev/rs/fyl
+```
+
+- ``-n, --last-messages N``: number of recent messages to search
+  (default: 5).
+- Searches the same content as ``list-sessions --search`` (text,
+  tool_use, tool_result) but limited to the tail of the transcript.
+- Returns error if zero or multiple sessions match; use ``-t`` or
+  ``-p`` to narrow.
+
+### ``--pid`` (process-based identification)
+
+Find a session from a running AI process PID. Reads
+``/proc/<pid>/environ``, ``/proc/<pid>/cwd``, and detects the
+provider from the process name or its ancestors.
+
+```sh
+# Identify session from an opencode attach process
+ai-audit current-session --pid 286943
+
+# With provider filter
+ai-audit current-session --pid 286943 -t opencode
+```
+
+Detection chain:
+1. Check ``/proc/<pid>/environ`` for ``OPENCODE_SESSION_ID`` /
+   ``CLAUDE_SESSION_ID``
+2. Detect provider from process name (``opencode``, ``claude``) or
+   ancestors
+3. Read working directory from ``/proc/<pid>/cwd`` or ``--dir`` in
+   cmdline
+4. Gather candidate sessions → fingerprint → most-recent fallback
+
+### Auto-detection (default)
 
 Uses the same auto-detection logic as ``transcript`` (env vars,
 process tree, transcript fingerprinting). Useful as a building block

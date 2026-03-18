@@ -1,5 +1,15 @@
 # Coding Guidelines
 
+## Plan Before Modifying
+
+Before changing ANY file, you MUST:
+
+1. **Present a plan** describing what you intend to change and where.
+2. **Explain why** — state the reasoning behind the plan and why you believe it addresses the user's request.
+3. **Wait for explicit user validation** before modifying any file.
+
+Do NOT edit, create, or delete files until the user approves the plan. No exceptions.
+
 ## Fail Fast & Be Strict
 
 - Detect and report errors as early as possible.

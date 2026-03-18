@@ -51,7 +51,6 @@ Implement in order of priority:
 - Fail fast with clear, actionable error messages.
 - Handle SIGINT/SIGTERM gracefully (cleanup, no stack traces).
 - Prefer explicit flags over implicit behavior.
-- Consider `-q`/`--quiet` and `-v`/`--verbose` for output control.
 
 ## Configuration
 

@@ -15,12 +15,11 @@ References below are relative to this file.
 - **BLOCKING**: Before ANY `git push` command, READ `references/git-push-convention.md` and follow its rules. No exceptions.
 - **BLOCKING**: Before granting ANY permissions, READ `references/permission-levels.md` and consider the appropriate level (project/domain/global). No exceptions.
 - **BLOCKING**: Before creating or writing ANY `CLAUDE.md` or `AGENTS.md` file, READ `references/agents-md-convention.md`. No exceptions.
-- **BLOCKING**: Before writing ANY code, READ `references/coding-guidelines.md`. No exceptions.
+- **BLOCKING**: Before implementing ANY change, you MUST first present an implementation plan and wait for explicit user approval. Do NOT edit, create, or delete files until the user says to proceed. READ `references/coding-guidelines.md`. No exceptions.
 - **BLOCKING**: Before starting ANY significant change in an existing project, READ `references/pre-work-checklist.md` and ensure a clean git save point. No exceptions.
 - **BLOCKING**: After implementing ANY feature, fix, or change, you MUST verify it works BY YOURSELF. NEVER ask the user to test, check, or verify your work. READ `references/self-verification.md` and write automated tests. No exceptions.
 - **BLOCKING**: Before writing or modifying ANY test, READ `references/test-engineering.md`. Tests verify the SPECIFICATION, not the implementation. Write tests first, then fix code. No exceptions.
 - **BLOCKING**: Before creating ANY CLI executable, READ `references/cli-guidelines.md`. No exceptions.
-- **BLOCKING**: Before structuring a Rust CLI project's `src/` directory, READ `references/rust-cli-structure.md`. No exceptions.
 - **BLOCKING**: Before writing ANY org-mode content, READ `references/org-syntax.md`. No exceptions.
 - **BLOCKING**: Before creating or modifying this file or ANY file in `references/`, READ `references/global-rules-management.md`. No exceptions.
 - **BLOCKING**: Before running any project operation (build/test/deploy, device interaction via adb/fastboot), READ the repo's `AGENTS.md` first. Use documented environment (e.g., Java version) and prefer helper scripts over raw commands. No exceptions.

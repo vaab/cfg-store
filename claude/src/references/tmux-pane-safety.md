@@ -29,11 +29,20 @@ When running tests or experiments for your own verification:
 3. Destroy the session when done: `tmux kill-session -t test-<purpose>`
 4. Never use the user's active session for internal tests
 
-## User-Facing Demos
+## Splitting a Pane
 
-When the user asks for a demo in their current session:
+Splitting is a destructive operation — it halves the target pane's
+space.  Apply the same care as killing.
 
-### Before splitting
+### Before splitting — ownership check
+
+1. Identify your pane via `$OPENCODE_REQUEST_CONTEXT` (see
+   `tmux-layout-awareness.md` § "Agent Identity in Tmux")
+2. Only split **your own pane** (the OpenCode client pane or a pane
+   you previously created)
+3. **NEVER** split a pane belonging to the user without asking first
+
+### Before splitting — dimensions check
 
 Check the target pane's dimensions:
 
@@ -41,13 +50,18 @@ Check the target pane's dimensions:
 tmux display -t <target> -p '#{pane_width}x#{pane_height}'
 ```
 
-**Minimum thresholds** (after split):
-- Horizontal split (`split-window -h`): each resulting pane must be ≥ 40 columns wide
-- Vertical split (`split-window -v`): each resulting pane must be ≥ 25 rows tall
+**Minimum thresholds** (each resulting pane, after split):
+- Width: ≥ 80 columns
+- Height: ≥ 30 rows
 
 This means:
-- Do not split horizontally a pane that is < 80 columns wide
-- Do not split vertically a pane that is < 50 rows tall
+- Do not split horizontally (`split-window -h`) if the pane is < 160 columns wide
+- Do not split vertically (`split-window -v`) if the pane is < 60 rows tall
+
+**Decision procedure** — try in order, pick the first that fits:
+1. Horizontal split (`-h`, side-by-side) if pane width ≥ 160
+2. Vertical split (`-v`, top/bottom) if pane height ≥ 60
+3. Neither fits → ask the user (see below)
 
 ### If there is not enough space
 

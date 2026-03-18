@@ -129,18 +129,24 @@ Example:
 
 ### Context Subheading
 
-First subheading explains why the work was triggered:
+First subheading describes the observable situation — facts only, no
+analysis or fix description:
 
 ```org
 *** Context
 
-Why this work was triggered (request, ticket, issue report).
+On =vps-04.0k.io=, ~compose up~ would randomly fail with:
+
+#+begin_example
+Error: container charming_cartwright from foreign project ''
+#+end_example
 ```
 
 The context section contains:
-- What triggered the work
-- Why the activity was needed
-- Initial problem description
+- Where it happened (host name, environment)
+- Who reported it and when (with link to source if applicable)
+- What was observed (error messages, symptoms)
+- NOT the root cause analysis or how it was fixed
 
 ### Logs Subheading
 
@@ -167,7 +173,7 @@ Modifié le fichier X pour...
 Each log entry:
 - Has a descriptive title (no date - CLOCK entries provide timing)
 - Has its own LOGBOOK with CLOCK entries
-- Contains intervention details or reflections
+- Contains the analysis, root cause, and resolution details
 - Ordered chronologically (based on CLOCK timestamps)
 
 ### Writing Style
