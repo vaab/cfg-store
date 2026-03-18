@@ -9,5 +9,9 @@ for bin in ~/.nvm/versions/node/*/bin/*; do
 done
 bin_autoload["switch-to-dev"]=1
 bin_autoload["pkg"]=1
+bin_autoload["oc"]=1
+bin_autoload["insight-cli"]=1
+bin_autoload["opencode-update"]=1
+
 
 autoload nvm "source $NVM_DIR/nvm.sh" "${!bin_autoload[@]}"
