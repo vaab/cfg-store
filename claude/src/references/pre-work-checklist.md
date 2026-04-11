@@ -33,6 +33,24 @@ these bullets before coding:
 
 This takes 30 seconds and prevents hallucinated requirements.
 
+## Read-Only Alternatives to Stash
+
+If you need to inspect committed state while uncommitted changes exist,
+NEVER use `git stash` — even "temporarily". Stash is a mutation on user
+state and can be lost on any crash, interruption, or forgotten `pop`.
+The rule is NEVER, not "only when careful". Use these alternatives:
+
+| What you want                        | DO NOT use                       | USE instead                             |
+| ------------------------------------ | -------------------------------- | --------------------------------------- |
+| See file as on HEAD                  | `git stash` then read            | `git show HEAD:path/to/file`            |
+| Compare file to HEAD                 | `git stash; diff; git stash pop` | `git diff HEAD -- path/to/file`         |
+| See file as on another commit/branch | `git stash` then checkout        | `git show <ref>:path/to/file`           |
+| Run tests/build on clean state       | `git stash`                      | `git worktree add /tmp/clean HEAD`      |
+| Just read what's in a file           | `git stash`                      | Read tool directly — you don't need git |
+
+Every stash done "just for a second" can become permanent data loss.
+There is always a read-only alternative; reach for it first.
+
 ## Why
 
 A clean git save point before starting work ensures:
