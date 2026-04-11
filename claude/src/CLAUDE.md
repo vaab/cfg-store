@@ -35,6 +35,7 @@ References below are relative to this file.
 - **BLOCKING**: Before working on ANY remote server via SSH, READ `references/remote-ssh-workflow.md`. All remote work must happen in a visible tmux pane. No exceptions.
 - **BLOCKING**: Before creating, splitting, killing, or resizing ANY tmux pane, window, or session, READ `references/tmux-pane-safety.md`. Verify before destroying. No exceptions.
 - Before inspecting or reasoning about tmux pane layouts, or when the user refers to a pane by spatial position (left, right, above, below, top, bottom), READ `references/tmux-layout-awareness.md` and run `ai-tmux layout -c` to resolve pane IDs. No exceptions.
+- **BLOCKING**: When the user reports a bug, unexpected behavior, or asks to fix/diagnose an issue, READ `references/diagnostic-protocol.md`. Diagnose first, prove the cause, present findings — NEVER fix on impulse. No exceptions.
 - **BLOCKING**: When a mistake is identified (by user or self), IMMEDIATELY invoke the `/learn-from-mistake` skill. Do NOT just acknowledge - run the full workflow. No exceptions.
   - **Hard triggers** (invoke skill immediately, NO clarifying questions first): "you made a mistake", "that's wrong", "you violated X", "you ignored instructions", "mistake again"
   - When these phrases appear, your FIRST action must be to invoke the skill - do not ask "what did I do wrong?"
