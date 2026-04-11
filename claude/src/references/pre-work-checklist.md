@@ -13,6 +13,10 @@ you have a clean save point.
    - NEVER commit on the user's behalf without explicit approval.
    - NEVER discard, reset, or checkout over uncommitted changes.
    - The ONLY safe action is to REPORT and WAIT.
+   - To investigate WHERE the changes came from (past sessions, user
+     manual edits, their intent), delegate to a sub-agent per
+     `references/uncommitted-changes-triage.md`. Do NOT investigate
+     them in the active session — it pollutes context.
 3. **Confirm clean state**: `git status` must show a clean working
    tree with nothing to commit
 
